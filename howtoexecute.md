@@ -13,3 +13,5 @@ pip install --upgrade pip
 pip3 install --upgrade setuptools wheel
 
 python -m pip install pygame-ce
+
+pip install numpy
