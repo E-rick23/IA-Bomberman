@@ -1,13 +1,17 @@
 import numpy as np
+import random
 
 # Constantes do mapa
-
 VAZIO = 0
 PAREDE = 1
 BLOCO_DESTRUTIVEL = 2
 BOMBA = 3
-JOGADOR = 4
-INIMIGO = 5
+
+# Identificador dos 4 players
+P1 = 4
+P2 = 5
+P3 = 6
+P4 = 7
 
 linhas, colunas = 9, 9 # Variáveis da matriz do mapa
 mapa = np.zeros((linhas,colunas), dtype=int) # Criando o mapa preenchido com zeros
@@ -19,5 +23,26 @@ def gerar_pilares(matriz):
             if x % 2 != 0 and y % 2 != 0:
                 matriz[y][x] = PAREDE
 
-gerar_pilares(mapa)
+#Função que espalha blocos destrutíveis aleatóriamente pelo mapa, evitando cantos.
+#A densidade é um valor entre 0.0 e 1.0 que define a chance de um bloco aparecer.
+def espalhar_blocos(matriz, densidade=0.6):
+    #Últimas posições do grid
+    L = linhas -1
+    C = colunas -1
+    #Coordenadas que devem permanecer vazias
+    areas_seguras = [
+            (0,0),(0,1),(1,0), #Superior Esquerdo (P1)
+            (0, C), (0, C-1), (1, C), #Superior Direito (P2)
+            (L, 0), (L-1, 0), (L,1), #Inferior Esquerdo (P3)
+            (L, C), (L, C-1), (L-1, C) #Inferior Direito (P4)
+    ]
+    for y in range(linhas):
+        for x in range(colunas):
+            if matriz[y][x] == VAZIO and (y, x) not in areas_seguras:
+                if random.random() < densidade:
+                    matriz[y][x] = BLOCO_DESTRUTIVEL
+
+gerar_pilares(mapa) # Gerando o mapa
+espalhar_blocos(mapa, densidade=0.6) #60% de chance de um espaço livre virar um bloco destrutível
+
 print(mapa)
