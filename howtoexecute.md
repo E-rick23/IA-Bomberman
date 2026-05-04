@@ -15,3 +15,7 @@ pip3 install --upgrade setuptools wheel
 python -m pip install pygame-ce
 
 pip install numpy
+
+# Executar
+
+python mapgenerator.py
