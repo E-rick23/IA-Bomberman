@@ -42,7 +42,16 @@ def espalhar_blocos(matriz, densidade=0.6):
                 if random.random() < densidade:
                     matriz[y][x] = BLOCO_DESTRUTIVEL
 
+def posicionar_jogadores(matriz):
+    L = linhas - 1
+    C = colunas - 1
+    matriz[0][0] = P1 #Superior Esquerdo
+    matriz[0][C] = P2 #Superior Direito
+    matriz[L][0] = P3 #Inferior Esquerdo
+    matriz[L][C] = P4 #Inferior Direito
+
 gerar_pilares(mapa) # Gerando o mapa
 espalhar_blocos(mapa, densidade=0.6) #60% de chance de um espaço livre virar um bloco destrutível
+posicionar_jogadores(mapa)
 
 print(mapa)
