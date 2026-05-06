@@ -1,20 +1,9 @@
 import numpy as np
 import random
+from config import *
 
-# Constantes do mapa
-VAZIO = 0
-PAREDE = 1
-BLOCO_DESTRUTIVEL = 2
-BOMBA = 3
-
-# Identificador dos 4 players
-P1 = 4
-P2 = 5
-P3 = 6
-P4 = 7
-
-linhas, colunas = 9, 9 # Variáveis da matriz do mapa
-mapa = np.zeros((linhas,colunas), dtype=int) # Criando o mapa preenchido com zeros
+def criar_matriz_vazia():
+    return np.zeros((LINHAS,COLUNAS), dtype=int) # Criando o mapa preenchido com zeros
 
 #Cria as paredes fixas no mapa, estilo xadrez.
 def gerar_pilares(matriz):
@@ -27,8 +16,8 @@ def gerar_pilares(matriz):
 #A densidade é um valor entre 0.0 e 1.0 que define a chance de um bloco aparecer.
 def espalhar_blocos(matriz, densidade=0.6):
     #Últimas posições do grid
-    L = linhas -1
-    C = colunas -1
+    L = LINHAS -1
+    C = COLUNAS -1
     #Coordenadas que devem permanecer vazias
     areas_seguras = [
             (0,0),(0,1),(1,0), #Superior Esquerdo (P1)
@@ -50,8 +39,3 @@ def posicionar_jogadores(matriz):
     matriz[L][0] = P3 #Inferior Esquerdo
     matriz[L][C] = P4 #Inferior Direito
 
-gerar_pilares(mapa) # Gerando o mapa
-espalhar_blocos(mapa, densidade=0.6) #60% de chance de um espaço livre virar um bloco destrutível
-posicionar_jogadores(mapa)
-
-print(mapa)
