@@ -7,8 +7,8 @@ def criar_matriz_vazia():
 
 #Cria as paredes fixas no mapa, estilo xadrez.
 def gerar_pilares(matriz):
-    for y in range(linhas):
-        for x in range(colunas):
+    for y in range(LINHAS):
+        for x in range(COLUNAS):
             if x % 2 != 0 and y % 2 != 0:
                 matriz[y][x] = PAREDE
 
@@ -25,15 +25,15 @@ def espalhar_blocos(matriz, densidade=0.6):
             (L, 0), (L-1, 0), (L,1), #Inferior Esquerdo (P3)
             (L, C), (L, C-1), (L-1, C) #Inferior Direito (P4)
     ]
-    for y in range(linhas):
-        for x in range(colunas):
+    for y in range(LINHAS):
+        for x in range(COLUNAS):
             if matriz[y][x] == VAZIO and (y, x) not in areas_seguras:
                 if random.random() < densidade:
                     matriz[y][x] = BLOCO_DESTRUTIVEL
 
 def posicionar_jogadores(matriz):
-    L = linhas - 1
-    C = colunas - 1
+    L = LINHAS - 1
+    C = COLUNAS - 1
     matriz[0][0] = P1 #Superior Esquerdo
     matriz[0][C] = P2 #Superior Direito
     matriz[L][0] = P3 #Inferior Esquerdo
