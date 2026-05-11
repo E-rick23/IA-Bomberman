@@ -1,4 +1,5 @@
 import mapgenerator
+import testes
 
 def main():
     tabuleiro = mapgenerator.criar_matriz_vazia() # Gerando o mapa
@@ -10,8 +11,11 @@ def main():
     mapgenerator.posicionar_jogadores(tabuleiro) # Posiciona os jogadores
 
     # Printa o mapa
-    print("\n Mapa gerado:")
+    print("\n Estado Inicial:")
     print(tabuleiro) 
 
+    # Função de teste de movimento (Nota: Desative a função de gerar_pilares para garantir o movimento para baixo).
+    testes.testar_movimentacao(tabuleiro)
+    
 if __name__ == "__main__":
     main()
