@@ -15,7 +15,9 @@ def main():
     print(tabuleiro) 
 
     # Função de teste de movimento (Nota: Desative a função de gerar_pilares para garantir o movimento para baixo).
-    testes.testar_movimentacao(tabuleiro)
+    #testes.testar_movimentacao(tabuleiro)
+    # Função de teste de Bombas
+    testes.testar_bombas(tabuleiro)
     
 if __name__ == "__main__":
     main()

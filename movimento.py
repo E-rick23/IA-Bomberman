@@ -1,6 +1,7 @@
 # movimento.py
 
 from config import *
+import bombas 
 
 def tentar_mover(matriz, y_atual, x_atual, delta_y, delta_x, id_entidade):
     """
@@ -13,13 +14,20 @@ def tentar_mover(matriz, y_atual, x_atual, delta_y, delta_x, id_entidade):
 
     # Verifica se a nova posição está dentro dos limites do mapa
     if 0 <= novo_y < LINHAS and 0 <= novo_x < COLUNAS:
-        
-        # Verifica se a célula de destino está VAZIA (não é parede, bloco ou bomba)
-        if matriz[novo_y][novo_x] == VAZIO:
-            
-            # Executa o movimento na matriz de dados
-            matriz[y_atual][x_atual] = VAZIO         # Apaga o personagem da posição antiga
-            matriz[novo_y][novo_x] = id_entidade     # Adiciona ele na posição nova
+    
+        # Verifica se o jogador estava em cima de uma bomba que acabou de plantar
+            deixou_bomba_para_tras = False
+            for b in bombas.bombas_ativas:
+                if b['y'] == y_atual and b['x'] == x_atual:
+                    deixou_bomba_para_tras = True
+                    break
+                    
+                if deixou_bomba_para_tras:
+                    matriz[y_atual][x_atual] = BOMBA # Restaura a imagem da bomba na matriz!
+                else:
+                    matriz[y_atual][x_atual] = VAZIO # Apaga normalmente
+                        
+            matriz[novo_y][novo_x] = id_entidade     # Adiciona o jogador na posição nova
             
             return novo_y, novo_x
             
