@@ -18,4 +18,4 @@ pip install numpy
 
 # Executar
 
-python mapgenerator.py
+python main.py
