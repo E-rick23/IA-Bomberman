@@ -13,8 +13,17 @@ def main():
     largura_tela = COLUNAS * TILE_SIZE
     altura_tela = LINHAS * TILE_SIZE
     tela = pygame.display.set_mode((largura_tela, altura_tela))
-    
+    visual.carregar_recursos()
     clock = pygame.time.Clock()
+    # Estado inicial do Player 1
+    player_estado = {
+        "y": 0,
+        "x": 0,
+        "direcao": "baixo",       # "cima", "baixo", "esquerda", "direita"
+        "status": "parado",       # "parado", "andando", "plantando"
+        "frame_atual": 0,         # Controla qual perna/braço está usando
+        "timer_animacao": 0       # Tempo para alternar os frames da caminhada
+    }
 
     # Gerando o cenário inicial com a sua lógica existente
     tabuleiro = mapgenerator.criar_matriz_vazia()
@@ -25,25 +34,55 @@ def main():
     # Loop principal do jogo
     rodando = True
     while rodando:
-        # 1. Tratamento de Eventos (Inputs)
+        # Pega o tempo decorrido desde o último frame (em milissegundos)
+        dt = clock.tick(60) 
+
+        # PARTE 1: CAPTURA DE INPUTS (Eventos do Teclado)
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 rodando = False
+            
+            # EXEMPLO SIMPLES: Se apertar uma tecla, muda o estado para testar
+            elif evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_RIGHT:
+                    player_estado["direcao"] = "direita"
+                    player_estado["status"] = "andando"
+                elif evento.key == pygame.K_LEFT:
+                    player_estado["direcao"] = "esquerda"
+                    player_estado["status"] = "andando"
+                    
+            # Se soltar a tecla, ele volta a ficar parado
+            elif evento.type == pygame.KEYUP:
+                player_estado["status"] = "parado"
 
-        # 2. Atualização de Lógica (Vazio por enquanto)
+        # PARTE 2: ATUALIZAÇÃO DA LÓGICA 
 
-        # 3. Renderização
-        tela.fill((0, 0, 0)) # Limpa a tela com fundo preto
+        if player_estado["status"] == "andando":
+            # Acumula o tempo que passou (dt) no timer de animação
+            player_estado["timer_animacao"] += dt
+            
+            # Se passou mais de 150 milissegundos, alterna o frame
+            if player_estado["timer_animacao"] > 150:
+                player_estado["timer_animacao"] = 0
+                
+                # Busca as imagens da direção atual
+                lista_frames = visual.animacoes_player[player_estado["direcao"]]["andando"]
+                
+                # Alterna o índice do frame (0, 1, 0, 1...)
+                player_estado["frame_atual"] = (player_estado["frame_atual"] + 1) % len(lista_frames)
+
+        # PARTE 3: RENDERIZAÇÃO 
+        tela.fill((0, 0, 0)) 
         
-        # Chama a função que criamos para desenhar o tabuleiro
+        # Desenha o mapa (cenário estático)
         visual.desenhar_mapa(tela, tabuleiro)
         
-        pygame.display.flip() # Atualiza a tela com o que foi desenhado
+        # Desenha o jogador dinâmico baseado no estado dele
+        visual.desenhar_player(tela, player_estado)
         
-        clock.tick(60) # Limita o loop a 60 frames por segundo
+        pygame.display.flip() 
 
     pygame.quit()
     sys.exit()
-
 if __name__ == "__main__":
     main()

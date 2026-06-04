@@ -15,5 +15,12 @@ P3 = 6
 P4 = 7
 
 # Variáveis do pygame
-TILE_SIZE = 64 #Tamanho de cada bloco
 
+#Dimensões do sprite
+SPRITE_SIZE = 16
+
+#Fator de Escala
+ESCALA = 4
+
+#Tamanho de cada bloco
+TILE_SIZE = SPRITE_SIZE * ESCALA
