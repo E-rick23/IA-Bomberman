@@ -13,3 +13,7 @@ P1 = 4
 P2 = 5
 P3 = 6
 P4 = 7
+
+# Variáveis do pygame
+TILE_SIZE = 64 #Tamanho de cada bloco
+
