@@ -1,8 +1,9 @@
 import pygame
 import sys
 import mapgenerator
-from config import *
 import visual
+import movimento
+from config import *
 
 def main():
     # Inicializa o Pygame
@@ -42,18 +43,53 @@ def main():
             if evento.type == pygame.QUIT:
                 rodando = False
             
-            # EXEMPLO SIMPLES: Se apertar uma tecla, muda o estado para testar
             elif evento.type == pygame.KEYDOWN:
+                # Variáveis temporárias para calcular o passo
+                delta_y = 0
+                delta_x = 0
+                
                 if evento.key == pygame.K_RIGHT:
                     player_estado["direcao"] = "direita"
                     player_estado["status"] = "andando"
+                    delta_x = 1
+                    
                 elif evento.key == pygame.K_LEFT:
                     player_estado["direcao"] = "esquerda"
                     player_estado["status"] = "andando"
+                    delta_x = -1
                     
-            # Se soltar a tecla, ele volta a ficar parado
+                elif evento.key == pygame.K_DOWN:
+                    player_estado["direcao"] = "baixo"
+                    player_estado["status"] = "andando"
+                    delta_y = 1
+                    
+                elif evento.key == pygame.K_UP:
+                    player_estado["direcao"] = "cima"
+                    player_estado["status"] = "andando"
+                    delta_y = -1
+
+                # Se houve intenção de movimento, aplica a sua lógica
+                if delta_x != 0 or delta_y != 0:
+                    # Envia a matriz e a posição atual para o seu script de movimento
+                    novo_y, novo_x = movimento.tentar_mover(
+                        tabuleiro, 
+                        player_estado["y"], 
+                        player_estado["x"], 
+                        delta_y, 
+                        delta_x, 
+                        P1
+                    )
+                    
+                    # Atualiza a posição do jogador no dicionário de estado
+                    player_estado["y"] = novo_y
+                    # Se bater em uma parede, novo_x/y voltam iguais ao que eram,
+                    player_estado["x"] = novo_x
+                    # impedindo o jogador de sair do lugar na tela!
+
             elif evento.type == pygame.KEYUP:
-                player_estado["status"] = "parado"
+                # Quando soltar qualquer tecla de seta, o jogador para a animação
+                if evento.key in [pygame.K_RIGHT, pygame.K_LEFT, pygame.K_DOWN, pygame.K_UP]:
+                    player_estado["status"] = "parado"       
 
         # PARTE 2: ATUALIZAÇÃO DA LÓGICA 
 
@@ -64,13 +100,16 @@ def main():
             # Se passou mais de 150 milissegundos, alterna o frame
             if player_estado["timer_animacao"] > 150:
                 player_estado["timer_animacao"] = 0
-                
-                # Busca as imagens da direção atual
+              
+                # Pega a lista correta para a direção atual
                 lista_frames = visual.animacoes_player[player_estado["direcao"]]["andando"]
-                
-                # Alterna o índice do frame (0, 1, 0, 1...)
-                player_estado["frame_atual"] = (player_estado["frame_atual"] + 1) % len(lista_frames)
-
+                                
+                # Evita divisão por zero se a lista estiver vazia por acidente
+                if len(lista_frames) > 0:
+                    player_estado["frame_atual"] = (player_estado["frame_atual"] + 1) % len(lista_frames)
+                else:
+                    player_estado["frame_atual"] = 0
+               
         # PARTE 3: RENDERIZAÇÃO 
         tela.fill((0, 0, 0)) 
         

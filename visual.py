@@ -36,13 +36,19 @@ def desenhar_player(tela, player_estado):
     
     direcao = player_estado["direcao"]
     status = player_estado["status"]
-    frame = player_estado["frame_atual"]
     
     # Se o status for parado ou plantando, geralmente só temos 1 frame (índice 0)
     if status != "andando":
         frame = 0
+    else:
+        frame = player_estado["frame_atual"]
+
+    lista_sprites = animacoes_player[direcao][status]
         
-    sprite_final = animacoes_player[direcao][status][frame]
+    # Prevenção contra estouro de índice (garante que o frame use o operador módulo ou limite)
+    frame_seguro = frame % len(lista_sprites)
+    
+    sprite_final = lista_sprites[frame_seguro]
     tela.blit(sprite_final, (pos_x, pos_y))
     
 def carregar_recursos():

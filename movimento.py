@@ -22,10 +22,10 @@ def tentar_mover(matriz, y_atual, x_atual, delta_y, delta_x, id_entidade):
                     deixou_bomba_para_tras = True
                     break
                     
-                if deixou_bomba_para_tras:
-                    matriz[y_atual][x_atual] = BOMBA # Restaura a imagem da bomba na matriz!
-                else:
-                    matriz[y_atual][x_atual] = VAZIO # Apaga normalmente
+            if deixou_bomba_para_tras:
+                matriz[y_atual][x_atual] = BOMBA # Restaura a imagem da bomba na matriz!
+            else:
+                matriz[y_atual][x_atual] = VAZIO # Apaga normalmente
                         
             matriz[novo_y][novo_x] = id_entidade     # Adiciona o jogador na posição nova
             
