@@ -1,120 +1,107 @@
-# visual.py
+from time import sleep
+
 import pygame
 from config import *
 
-# Dicionário para guardar as imagens carregadas e escalonadas
 sprites = {}
 
-# Definição de Cores (RGB)
-COR_VAZIO = (34, 139, 34)         # Verde (Grama)
-COR_PAREDE = (128, 128, 128)      # Cinza (Pilar indestrutível)
-COR_BLOCO = (139, 69, 19)         # Marrom (Bloco destrutível)
-COR_BOMBA = (0, 0, 0)             # Preto
-COR_PLAYER = (0, 0, 255)          # Azul (Representando o P1)
-COR_INIMIGO = (255, 0, 0)         # Vermelho (Outros players)
-
-# Dicionário estruturado para as animações do jogador
 animacoes_player = {
     "direita":  {"parado": [], "andando": [], "plantando": []},
     "esquerda": {"parado": [], "andando": [], "plantando": []},
     "baixo":    {"parado": [], "andando": [], "plantando": []},
-    "cima":     {"parado": [], "andando": [], "plantando": []}
+    "cima":     {"parado": [], "andando": [], "plantando": []},
 }
 
+
 def recortar_sprite(sheet, col, linha):
-    """Corta um quadrado 16x16 da spritesheet e amplia para o TILE_SIZE."""
-    # Define o retângulo de corte na imagem original (16x16)
     rect = pygame.Rect(col * SPRITE_SIZE, linha * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE)
-    sub_surface = sheet.subsurface(rect)
-    
-    # Amplia preservando os pixels nítidos (Filtro NEAREST)
-    return pygame.transform.scale(sub_surface, (TILE_SIZE, TILE_SIZE))
+    sub = sheet.subsurface(rect)
+    return pygame.transform.scale(sub, (TILE_SIZE, TILE_SIZE))
 
-def desenhar_player(tela, player_estado):
-    pos_x = player_estado["x"] * TILE_SIZE
-    pos_y = player_estado["y"] * TILE_SIZE
-    
-    direcao = player_estado["direcao"]
-    status = player_estado["status"]
-    
-    # Se o status for parado ou plantando, geralmente só temos 1 frame (índice 0)
-    if status != "andando":
-        frame = 0
-    else:
-        frame = player_estado["frame_atual"]
 
-    lista_sprites = animacoes_player[direcao][status]
-        
-    # Prevenção contra estouro de índice (garante que o frame use o operador módulo ou limite)
-    frame_seguro = frame % len(lista_sprites)
-    
-    sprite_final = lista_sprites[frame_seguro]
-    tela.blit(sprite_final, (pos_x, pos_y))
-    
+def _fazer_sprite_solido(cor):
+    s = pygame.Surface((SPRITE_SIZE, SPRITE_SIZE))
+    s.fill(cor)
+    return pygame.transform.scale(s, (TILE_SIZE, TILE_SIZE))
+
+
+def _fazer_sprite_bomba():
+    s = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
+    cx, cy, r = TILE_SIZE // 2, TILE_SIZE // 2, TILE_SIZE // 2 - 4
+    pygame.draw.circle(s, (20, 20, 20), (cx, cy), r)
+    # Pavio
+    pygame.draw.line(s, (200, 100, 0), (cx, cy - r), (cx + 6, cy - r - 8), 3)
+    return s
+
+
 def carregar_recursos():
-    """Carrega as imagens 16x16 e redimensiona para o tamanho de exibição."""
     global animacoes_player
-    # Carrega a spritesheet (lembre de salvar sua imagem na pasta do script)
-    sheet = pygame.image.load("Assets/Players.png").convert_alpha()
-    
-    # --- DIREITA ---
-    animacoes_player["direita"]["parado"].append(recortar_sprite(sheet, 0, 0))
-    animacoes_player["direita"]["andando"].append(recortar_sprite(sheet, 1, 0))
-    animacoes_player["direita"]["plantando"].append(recortar_sprite(sheet, 2, 0))
-    
-    # --- ESQUERDA ---
-    animacoes_player["esquerda"]["parado"].append(recortar_sprite(sheet, 0, 1))
-    animacoes_player["esquerda"]["andando"].append(recortar_sprite(sheet, 1, 1))
-    animacoes_player["esquerda"]["plantando"].append(recortar_sprite(sheet, 2, 1))
-    
-    # --- BAIXO --- (Tem 2 frames de caminhada alternando braços)
-    animacoes_player["baixo"]["parado"].append(recortar_sprite(sheet, 5, 0))
-    animacoes_player["baixo"]["andando"].append(recortar_sprite(sheet, 6, 0)) # Braço R
-    animacoes_player["baixo"]["andando"].append(recortar_sprite(sheet, 6, 1)) # Braço L
-    
-    # --- CIMA --- (Tem 2 frames de caminhada alternando braços)
-    animacoes_player["cima"]["parado"].append(recortar_sprite(sheet, 7, 0))
-    animacoes_player["cima"]["andando"].append(recortar_sprite(sheet, 8, 0)) # Braço R
-    animacoes_player["cima"]["andando"].append(recortar_sprite(sheet, 8, 1)) # Braço L
-    
-    # Por enquanto, vamos criar superfícies genéricas de 16x16 para simular os seus sprites
-    img_vazio = pygame.Surface((SPRITE_SIZE, SPRITE_SIZE))
-    img_vazio.fill((34, 139, 34)) # Verde
-    
-    img_parede = pygame.Surface((SPRITE_SIZE, SPRITE_SIZE))
-    img_parede.fill((128, 128, 128)) # Cinza
-    
-    img_bloco = pygame.Surface((SPRITE_SIZE, SPRITE_SIZE))
-    img_bloco.fill((139, 69, 19)) # Marrom
-    
-    img_p1 = pygame.Surface((SPRITE_SIZE, SPRITE_SIZE), pygame.SRCALPHA)
-    pygame.draw.circle(img_p1, (0, 0, 255), (SPRITE_SIZE//2, SPRITE_SIZE//2), SPRITE_SIZE//2 - 1) # Círculo Azul interno
-    
-    # ESCALONAMENTO: Aqui o Pygame pega a imagem 16x16 e transforma no TILE_SIZE (ex: 64x64)
-    # O filtro 'NEAREST' impede que a pixel art fique borrada ao crescer
-    sprites[VAZIO] = pygame.transform.scale(img_vazio, (TILE_SIZE, TILE_SIZE))
-    sprites[PAREDE] = pygame.transform.scale(img_parede, (TILE_SIZE, TILE_SIZE))
-    sprites[BLOCO_DESTRUTIVEL] = pygame.transform.scale(img_bloco, (TILE_SIZE, TILE_SIZE))
-    sprites[P1] = pygame.transform.scale(img_p1, (TILE_SIZE, TILE_SIZE))
-    
+
+    # Tenta carregar spritesheet real; se não existir usa placeholders
+    try:
+        sheet = pygame.image.load("Assets/Players.png").convert_alpha()
+
+        animacoes_player["direita"]["parado"].append(recortar_sprite(sheet, 0, 0))
+        animacoes_player["direita"]["andando"].append(recortar_sprite(sheet, 1, 0))
+        animacoes_player["direita"]["plantando"].append(recortar_sprite(sheet, 2, 0))
+
+        animacoes_player["esquerda"]["parado"].append(recortar_sprite(sheet, 0, 1))
+        animacoes_player["esquerda"]["andando"].append(recortar_sprite(sheet, 1, 1))
+        animacoes_player["esquerda"]["plantando"].append(recortar_sprite(sheet, 2, 1))
+
+        animacoes_player["baixo"]["parado"].append(recortar_sprite(sheet, 5, 0))
+        animacoes_player["baixo"]["andando"].append(recortar_sprite(sheet, 6, 0))
+        animacoes_player["baixo"]["andando"].append(recortar_sprite(sheet, 6, 1))
+
+        animacoes_player["cima"]["parado"].append(recortar_sprite(sheet, 7, 0))
+        animacoes_player["cima"]["andando"].append(recortar_sprite(sheet, 8, 0))
+        animacoes_player["cima"]["andando"].append(recortar_sprite(sheet, 8, 1))
+
+    except (pygame.error, FileNotFoundError):
+        # Placeholder: quadrado azul para o jogador
+        placeholder = _fazer_sprite_solido((0, 0, 255))
+        for direcao in animacoes_player:
+            for acao in animacoes_player[direcao]:
+                animacoes_player[direcao][acao] = [placeholder]
+
+    # Sprites do mapa
+    sprites[VAZIO]            = _fazer_sprite_solido((34, 139, 34))
+    sprites[PAREDE]           = _fazer_sprite_solido((128, 128, 128))
+    sprites[FOGO]             = _fazer_sprite_solido((255, 69, 0))
+    sprites[BLOCO_DESTRUTIVEL]= _fazer_sprite_solido((139, 69, 19))
+    sprites[BOMBA]            = _fazer_sprite_bomba()
+
+
 def desenhar_mapa(tela, matriz):
-    """Desenha o mapa utilizando os sprites escalonados."""
     for y in range(LINHAS):
         for x in range(COLUNAS):
-            pos_x = x * TILE_SIZE
-            pos_y = y * TILE_SIZE
-            
+            pos = (x * TILE_SIZE, y * TILE_SIZE)
             celula = matriz[y][x]
-            
-            # Como os players se movem por cima do chão, desenha o VAZIO (grama) primeiro
-            if celula in [P1, P2, P3, P4, BOMBA]:
-                tela.blit(sprites[VAZIO], (pos_x, pos_y))
-                
-            # Desenha o sprite correspondente se ele existir no nosso dicionário
-            if celula in sprites:
-                tela.blit(sprites[celula], (pos_x, pos_y))
-            else:
-                # Caso seja P2, P3 ou P4 e ainda não tenhamos o sprite deles
-                if celula != VAZIO:
-                    # Desenha o fundo padrão para segurança
-                    tela.blit(sprites[VAZIO], (pos_x, pos_y))
+
+            # Sempre desenha o chão primeiro
+            tela.blit(sprites[VAZIO], pos)
+
+            if celula == PAREDE:
+                tela.blit(sprites[PAREDE], pos)
+            elif celula == BLOCO_DESTRUTIVEL:
+                tela.blit(sprites[BLOCO_DESTRUTIVEL], pos)
+            elif celula == BOMBA:
+                tela.blit(sprites[BOMBA], pos)
+            elif celula == FOGO:
+                tela.blit(sprites[FOGO], pos)
+                sleep(0.1)  # Pequena pausa para destacar o fogo
+                matriz[y][x] = VAZIO
+            # Players são desenhados pelos próprios objetos Player
+
+
+def desenhar_hud(tela, jogadores):
+    """Exibe status básico dos jogadores no topo da tela."""
+    fonte = pygame.font.SysFont("Arial", 16, bold=True)
+    cores_id = {P1: (100, 180, 255), P2: (255, 120, 120)}
+    nomes_id  = {P1: "P1 ↑↓←→ [Space]", P2: "P2 WASD [Shift]"}
+
+    for i, jogador in enumerate(jogadores):
+        cor = cores_id.get(jogador.id, (255, 255, 255))
+        status = "VIVO" if jogador.vivo else "MORTO"
+        texto = fonte.render(f"{nomes_id.get(jogador.id, f'P{i+1}')}  {status}", True, cor)
+        tela.blit(texto, (10 + i * 300, 4))

@@ -1,4 +1,4 @@
-#Dimensões do mapa (Sempre ímpares)
+# Dimensões do mapa (Sempre ímpares)
 LINHAS = 9
 COLUNAS = 9
 
@@ -7,6 +7,7 @@ VAZIO = 0
 PAREDE = 1
 BLOCO_DESTRUTIVEL = 2
 BOMBA = 3
+FOGO = 8
 
 # Identificador dos 4 players
 P1 = 4
@@ -16,11 +17,11 @@ P4 = 7
 
 # Variáveis do pygame
 
-#Dimensões do sprite
+# Dimensões do sprite
 SPRITE_SIZE = 16
 
-#Fator de Escala
+# Fator de Escala
 ESCALA = 4
 
-#Tamanho de cada bloco
+# Tamanho de cada bloco
 TILE_SIZE = SPRITE_SIZE * ESCALA
