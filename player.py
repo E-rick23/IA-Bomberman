@@ -20,6 +20,20 @@ class Player:
             "direita": pygame.K_d,
             "bomba": pygame.K_LSHIFT,
         },
+        P3: {
+            "cima": pygame.K_1,
+            "baixo": pygame.K_2,
+            "esquerda": pygame.K_3,
+            "direita": pygame.K_4,
+            "bomba": pygame.K_5,
+        },
+        P4: {
+            "cima": pygame.K_i,
+            "baixo": pygame.K_k,
+            "esquerda": pygame.K_j,
+            "direita": pygame.K_l,
+            "bomba": pygame.K_RSHIFT,
+        },
     }
 
     def __init__(self, y, x, player_id=P1):
