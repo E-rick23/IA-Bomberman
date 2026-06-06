@@ -1,5 +1,5 @@
 import pygame
-from config import *
+import config
 
 bombas_ativas: list["Bomba"] = []
 
@@ -22,7 +22,7 @@ class Bomba:
     def calcular_explosao(self, matriz):
         """Propaga o fogo parando em paredes e destrindo blocos"""
         self.explodiu = True
-        matriz[self.y][self.x] = VAZIO
+        matriz[self.y][self.x] = config.VAZIO
 
         # Vetores de direção: (delta_y, delta_x)
         direcoes = [(-1, 0), (1, 0), (0, -1), (0, 1)]
@@ -33,39 +33,41 @@ class Bomba:
                 alvo_x = self.x + (dx * passo)
 
                 # Verificando se esta dentro do mapa
-                if not (0 <= alvo_y < LINHAS and 0 <= alvo_x < COLUNAS):
+                if not (0 <= alvo_y < config.LINHAS and 0 <= alvo_x < config.COLUNAS):
                     break
 
                 alvo = matriz[alvo_y][alvo_x]
 
                 # Verificando se bateu em uma parede fixa
-                if alvo == PAREDE:
+                if alvo == config.PAREDE:
                     break
 
                 # Verificando se bateu em um bloco destrutível
-                elif alvo == BLOCO_DESTRUTIVEL:
-                    matriz[alvo_y][alvo_x] = VAZIO  # Destrói o bloco
+                elif alvo == config.BLOCO_DESTRUTIVEL:
+                    matriz[alvo_y][alvo_x] = config.VAZIO  # Destrói o bloco
                     break  # O fogo para
 
                 # Caso o caminho esteja livre
                 else:
                     # Mata jogadores que estiverem no fogo
-                    if alvo in (P1, P2, P3, P4):
-                        matriz[alvo_y][alvo_x] = FOGO
+                    if alvo in (config.P1, config.P2, config.P3, config.P4):
+                        matriz[alvo_y][alvo_x] = config.FOGO
                     else:
-                        matriz[alvo_y][alvo_x] = FOGO
+                        matriz[alvo_y][alvo_x] = config.FOGO
 
     def desenhar(self, tela, sprite_bomba):
         """Desenhar a bomba na tela"""
         if not self.explodiu:
-            tela.blit(sprite_bomba, (self.x * TILE_SIZE, self.y * TILE_SIZE))
+            tela.blit(
+                sprite_bomba, (self.x * config.TILE_SIZE, self.y * config.TILE_SIZE)
+            )
 
 
 def plantar_bomba(matriz, y, x, raio=2, tempo_explosao=3000):
     """Cria uma bomba na posição e a registra na lista global."""
     bomba = Bomba(y, x, raio, tempo_explosao)
     bombas_ativas.append(bomba)
-    matriz[y][x] = BOMBA
+    matriz[y][x] = config.BOMBA
     return bomba
 
 

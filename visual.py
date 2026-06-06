@@ -1,33 +1,38 @@
 from time import sleep
 
 import pygame
-from config import *
+import config
 
 sprites = {}
 
 animacoes_player = {
-    "direita":  {"parado": [], "andando": [], "plantando": []},
+    "direita": {"parado": [], "andando": [], "plantando": []},
     "esquerda": {"parado": [], "andando": [], "plantando": []},
-    "baixo":    {"parado": [], "andando": [], "plantando": []},
-    "cima":     {"parado": [], "andando": [], "plantando": []},
+    "baixo": {"parado": [], "andando": [], "plantando": []},
+    "cima": {"parado": [], "andando": [], "plantando": []},
 }
 
 
 def recortar_sprite(sheet, col, linha):
-    rect = pygame.Rect(col * SPRITE_SIZE, linha * SPRITE_SIZE, SPRITE_SIZE, SPRITE_SIZE)
+    rect = pygame.Rect(
+        col * config.SPRITE_SIZE,
+        linha * config.SPRITE_SIZE,
+        config.SPRITE_SIZE,
+        config.SPRITE_SIZE,
+    )
     sub = sheet.subsurface(rect)
-    return pygame.transform.scale(sub, (TILE_SIZE, TILE_SIZE))
+    return pygame.transform.scale(sub, (config.TILE_SIZE, config.TILE_SIZE))
 
 
 def _fazer_sprite_solido(cor):
-    s = pygame.Surface((SPRITE_SIZE, SPRITE_SIZE))
+    s = pygame.Surface((config.SPRITE_SIZE, config.SPRITE_SIZE))
     s.fill(cor)
-    return pygame.transform.scale(s, (TILE_SIZE, TILE_SIZE))
+    return pygame.transform.scale(s, (config.TILE_SIZE, config.TILE_SIZE))
 
 
 def _fazer_sprite_bomba():
-    s = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
-    cx, cy, r = TILE_SIZE // 2, TILE_SIZE // 2, TILE_SIZE // 2 - 4
+    s = pygame.Surface((config.TILE_SIZE, config.TILE_SIZE), pygame.SRCALPHA)
+    cx, cy, r = config.TILE_SIZE // 2, config.TILE_SIZE // 2, config.TILE_SIZE // 2 - 4
     pygame.draw.circle(s, (20, 20, 20), (cx, cy), r)
     # Pavio
     pygame.draw.line(s, (200, 100, 0), (cx, cy - r), (cx + 6, cy - r - 8), 3)
@@ -65,43 +70,45 @@ def carregar_recursos():
                 animacoes_player[direcao][acao] = [placeholder]
 
     # Sprites do mapa
-    sprites[VAZIO]            = _fazer_sprite_solido((34, 139, 34))
-    sprites[PAREDE]           = _fazer_sprite_solido((128, 128, 128))
-    sprites[FOGO]             = _fazer_sprite_solido((255, 69, 0))
-    sprites[BLOCO_DESTRUTIVEL]= _fazer_sprite_solido((139, 69, 19))
-    sprites[BOMBA]            = _fazer_sprite_bomba()
+    sprites[config.VAZIO] = _fazer_sprite_solido((34, 139, 34))
+    sprites[config.PAREDE] = _fazer_sprite_solido((128, 128, 128))
+    sprites[config.FOGO] = _fazer_sprite_solido((255, 69, 0))
+    sprites[config.BLOCO_DESTRUTIVEL] = _fazer_sprite_solido((139, 69, 19))
+    sprites[config.BOMBA] = _fazer_sprite_bomba()
 
 
 def desenhar_mapa(tela, matriz):
-    for y in range(LINHAS):
-        for x in range(COLUNAS):
-            pos = (x * TILE_SIZE, y * TILE_SIZE)
+    for y in range(config.LINHAS):
+        for x in range(config.COLUNAS):
+            pos = (x * config.TILE_SIZE, y * config.TILE_SIZE)
             celula = matriz[y][x]
 
             # Sempre desenha o chão primeiro
-            tela.blit(sprites[VAZIO], pos)
+            tela.blit(sprites[config.VAZIO], pos)
 
-            if celula == PAREDE:
-                tela.blit(sprites[PAREDE], pos)
-            elif celula == BLOCO_DESTRUTIVEL:
-                tela.blit(sprites[BLOCO_DESTRUTIVEL], pos)
-            elif celula == BOMBA:
-                tela.blit(sprites[BOMBA], pos)
-            elif celula == FOGO:
-                tela.blit(sprites[FOGO], pos)
+            if celula == config.PAREDE:
+                tela.blit(sprites[config.PAREDE], pos)
+            elif celula == config.BLOCO_DESTRUTIVEL:
+                tela.blit(sprites[config.BLOCO_DESTRUTIVEL], pos)
+            elif celula == config.BOMBA:
+                tela.blit(sprites[config.BOMBA], pos)
+            elif celula == config.FOGO:
+                tela.blit(sprites[config.FOGO], pos)
                 sleep(0.1)  # Pequena pausa para destacar o fogo
-                matriz[y][x] = VAZIO
+                matriz[y][x] = config.VAZIO
             # Players são desenhados pelos próprios objetos Player
 
 
 def desenhar_hud(tela, jogadores):
     """Exibe status básico dos jogadores no topo da tela."""
     fonte = pygame.font.SysFont("Arial", 16, bold=True)
-    cores_id = {P1: (100, 180, 255), P2: (255, 120, 120)}
-    nomes_id  = {P1: "P1 ↑↓←→ [Space]", P2: "P2 WASD [Shift]"}
+    cores_id = {config.P1: (100, 180, 255), config.P2: (255, 120, 120)}
+    nomes_id = {config.P1: "P1 ↑↓←→ [Space]", config.P2: "P2 WASD [Shift]"}
 
     for i, jogador in enumerate(jogadores):
         cor = cores_id.get(jogador.id, (255, 255, 255))
         status = "VIVO" if jogador.vivo else "MORTO"
-        texto = fonte.render(f"{nomes_id.get(jogador.id, f'P{i+1}')}  {status}", True, cor)
+        texto = fonte.render(
+            f"{nomes_id.get(jogador.id, f'P{i+1}')}  {status}", True, cor
+        )
         tela.blit(texto, (10 + i * 300, 4))

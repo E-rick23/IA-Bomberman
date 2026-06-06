@@ -1,4 +1,4 @@
-# Dimensões do mapa (Sempre ímpares)
+# Dimensões do mapa (Sempre ímpares por conta das paredes fixas)
 LINHAS = 9
 COLUNAS = 9
 
