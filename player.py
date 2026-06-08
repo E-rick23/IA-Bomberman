@@ -112,8 +112,9 @@ class Player:
                     self.frame_atual = (self.frame_atual + 1) % len(lista)
 
     def _verificar_morte(self, matriz):
-        """Marca o jogador como morto se sua célula virou VAZIO"""
-        if matriz[self.y][self.x] == VAZIO:
+        """Marca o jogador como morto se sua célula virou FOGO ou VAZIO"""
+        # Se a célula foi tomada pelo fogo (8) ou limpa sem o jogador se mover (0)
+        if matriz[self.y][self.x] in (VAZIO, FOGO):
             self.vivo = False
 
     def desenhar(self, tela, animacoes):

@@ -22,7 +22,7 @@ class Bomba:
     def calcular_explosao(self, matriz):
         """Propaga o fogo parando em paredes e destrindo blocos"""
         self.explodiu = True
-        matriz[self.y][self.x] = config.VAZIO
+        matriz[self.y][self.x] = config.FOGO
 
         # Vetores de direção: (delta_y, delta_x)
         direcoes = [(-1, 0), (1, 0), (0, -1), (0, 1)]
