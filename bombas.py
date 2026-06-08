@@ -1,74 +1,79 @@
-from config import *
+import pygame
+import config
 
-# Lista para rastrear as bombas ativas.
-# Dicionário {'y': int, 'x': int, 'timer': 'int, 'raio': int}
+bombas_ativas: list["Bomba"] = []
 
-bombas_ativas = []
 
-def plantar_bomba(matriz, y, x, raio=2, tempo_explosao=3):
-    # Planta uma bomba na posição atual do jogador se a célula estiver livre.
-    if matriz[y][x] != BOMBA:
-        matriz[y][x] = BOMBA
-        nova_bomba = {
-            'y': y,
-            'x': x,
-            'timer': tempo_explosao,
-            'raio': raio
-        }
-        bombas_ativas.append(nova_bomba)
-        return True
-    return False
+class Bomba:
+    def __init__(self, y, x, raio=2, tempo_explosao=3000):
+        self.y = y
+        self.x = x
+        self.raio = raio
+        self.timer = tempo_explosao
+        self.explodiu = False
 
-def calcular_explosao(matriz, centro_y, centro_x, raio):
-    #Propaga o fogo nas 4 direções, destruindo blocos ou parando em paredes.
-    #O centro da explosão sempre fica vazio
-    matriz[centro_y][centro_x] = VAZIO
+    def atualizar(self, dt, matriz):
+        """Diminui o timer usando o delta time (dt) do Pygame"""
+        if not self.explodiu:
+            self.timer -= dt
+            if self.timer <= 0:
+                self.calcular_explosao(matriz)
 
-    #Vetores de direção: (delta_y, delta_x)
-    direcoes = [
-        (-1, 0), # Cima
-        (1, 0), # Baixo
-        (0, -1), # Esquerda
-        (0, 1) # Direita
-    ]
+    def calcular_explosao(self, matriz):
+        """Propaga o fogo parando em paredes e destrindo blocos"""
+        self.explodiu = True
+        matriz[self.y][self.x] = config.VAZIO
 
-    for dy, dx in direcoes:
-        for passo in range(1, raio + 1):
-            alvo_y = centro_y + (dy * passo)
-            alvo_x = centro_x + (dx * passo)
+        # Vetores de direção: (delta_y, delta_x)
+        direcoes = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-            #Verificando se saiu do mapa
-            if not (0 <= alvo_y < LINHAS and 0 <= alvo_x < COLUNAS):
-                break #impede que o fogo se espalhe
-            alvo = matriz[alvo_y][alvo_x]
+        for dy, dx in direcoes:
+            for passo in range(1, self.raio + 1):
+                alvo_y = self.y + (dy * passo)
+                alvo_x = self.x + (dx * passo)
 
-            #Verificando se bateu em uma parede fixa
-            if alvo == PAREDE:
-                break #Impede que o fogo se espalhe
+                # Verificando se esta dentro do mapa
+                if not (0 <= alvo_y < config.LINHAS and 0 <= alvo_x < config.COLUNAS):
+                    break
 
-            #Verificando se bateu em um bloco destrutível
-            elif alvo == BLOCO_DESTRUTIVEL:
-                matriz[alvo_y][alvo_x] = VAZIO # Destrói o bloco
-                break # O fogo para após destruir o bloco (não atravessa)
+                alvo = matriz[alvo_y][alvo_x]
 
-            # Caso o caminho esteja livre
-            else:
-                matriz[alvo_y][alvo_x] = VAZIO # Destroi o que estiver no caminho
-                #implementar morte do player aqui
-                 
-def atualizar_bombas(matriz):
-    # Diminui o timer de todas as bombas e verifica quais devem explodir
-    #Retorna uma lista das coordenadas que explodiram nesse turno
-    bombas_para_remover = []
+                # Verificando se bateu em uma parede fixa
+                if alvo == config.PAREDE:
+                    break
 
+                # Verificando se bateu em um bloco destrutível
+                elif alvo == config.BLOCO_DESTRUTIVEL:
+                    matriz[alvo_y][alvo_x] = config.VAZIO  # Destrói o bloco
+                    break  # O fogo para
+
+                # Caso o caminho esteja livre
+                else:
+                    # Mata jogadores que estiverem no fogo
+                    if alvo in (config.P1, config.P2, config.P3, config.P4):
+                        matriz[alvo_y][alvo_x] = config.FOGO
+                    else:
+                        matriz[alvo_y][alvo_x] = config.FOGO
+
+    def desenhar(self, tela, sprite_bomba):
+        """Desenhar a bomba na tela"""
+        if not self.explodiu:
+            tela.blit(
+                sprite_bomba, (self.x * config.TILE_SIZE, self.y * config.TILE_SIZE)
+            )
+
+
+def plantar_bomba(matriz, y, x, raio=2, tempo_explosao=3000):
+    """Cria uma bomba na posição e a registra na lista global."""
+    bomba = Bomba(y, x, raio, tempo_explosao)
+    bombas_ativas.append(bomba)
+    matriz[y][x] = config.BOMBA
+    return bomba
+
+
+def atualizar_bombas(matriz, dt=1):
+    """Atualiza todas as bombas e remove as que já explodiram."""
     for bomba in bombas_ativas:
-        bomba['timer'] -= 1
-
-        #Função que faz a bomba explodir
-        if bomba['timer'] <= 0:
-            calcular_explosao(matriz, bomba['y'], bomba['x'], bomba['raio'])
-            bombas_para_remover.append(bomba)
-
-    #Limpa as bombas que já explodiram da lista ativa
-    for bomba in bombas_para_remover:
-        bombas_ativas.remove(bomba)
+        bomba.atualizar(dt, matriz)
+    # Remove bombas que já explodiram (após a iteração, sem afetar o loop)
+    bombas_ativas[:] = [b for b in bombas_ativas if not b.explodiu]
