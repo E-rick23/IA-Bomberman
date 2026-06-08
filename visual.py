@@ -117,7 +117,7 @@ def desenhar_mapa(tela, matriz):
                 tela.blit(sprites[config.BOMBA], pos)
             elif celula == config.FOGO:
                 tela.blit(sprites[config.FOGO], pos)
-                sleep(0.1)  # Pequena pausa para destacar o fogo
+                #sleep(0.1)  # Pequena pausa para destacar o fogo
                 matriz[y][x] = config.VAZIO
             # Players são desenhados pelos próprios objetos Player
 

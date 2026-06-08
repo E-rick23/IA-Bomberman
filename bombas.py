@@ -3,7 +3,6 @@ import config
 
 bombas_ativas: list["Bomba"] = []
 
-
 class Bomba:
     def __init__(self, y, x, raio=2, tempo_explosao=3000):
         self.y = y
