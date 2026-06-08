@@ -1,5 +1,7 @@
 import pygame
 import sys
+import visual
+import config
 
 pygame.init()
 
@@ -152,3 +154,39 @@ class Menu:
             "players": self.qtd_players[self.players],
             "dificuldade": self.dificuldades[self.dificuldade],
         }
+
+    def selecionar_personagens(self, qtd_players):
+        escolhas = []
+        for p in range(qtd_players):
+            selecionado = 0
+            confirmado = False
+            while not confirmado:
+                self.tela.fill(PRETO)
+                self.desenhar_texto(f"JOGADOR {p+1}: ESCOLHA SEU HEROI", self.fonte_titulo, BRANCO, self.largura // 2, 80)
+                
+                # Desenhar os 4 personagens lado a lado
+                for i in range(4):
+                    sprite = visual.obter_sprite_menu(i)
+                    x = (self.largura // 5) * (i + 1)
+                    y = self.altura // 2
+                    
+                    # Destaque para o que está focado
+                    if i == selecionado:
+                        pygame.draw.rect(self.tela, AZUL_SELECIONADO, (x - 40, y - 40, 80, 80), 3)
+                    
+                    self.tela.blit(sprite, (x - config.TILE_SIZE//2, y - config.TILE_SIZE//2))
+                
+                self.desenhar_texto("< SETAS PARA MOVER | ENTER PARA CONFIRMAR >", self.fonte_opcoes, CINZA, self.largura // 2, 400)
+                pygame.display.flip()
+
+                for evento in pygame.event.get():
+                    if evento.type == pygame.KEYDOWN:
+                        if evento.key == pygame.K_LEFT:
+                            selecionado = (selecionado - 1) % 4
+                        elif evento.key == pygame.K_RIGHT:
+                            selecionado = (selecionado + 1) % 4
+                        elif evento.key == pygame.K_RETURN:
+                            escolhas.append(selecionado)
+                            confirmado = True
+        return escolhas
+    

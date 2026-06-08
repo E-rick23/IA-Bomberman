@@ -36,10 +36,11 @@ class Player:
         },
     }
 
-    def __init__(self, y, x, player_id=P1):
+    def __init__(self, y, x, player_id=P1, sprite_id=0):
         self.y = y
         self.x = x
         self.id = player_id
+        self.sprite_id = sprite_id
         self.direcao = "baixo"
         self.status = "parado"
         self.frame_atual = 0
@@ -106,7 +107,7 @@ class Player:
             self.timer_animacao += dt
             if self.timer_animacao > 150:
                 self.timer_animacao = 0
-                lista = animacoes[self.direcao]["andando"]
+                lista = animacoes[self.sprite_id][self.direcao]["andando"]
                 if lista:
                     self.frame_atual = (self.frame_atual + 1) % len(lista)
 

@@ -38,36 +38,59 @@ def _fazer_sprite_bomba():
     pygame.draw.line(s, (200, 100, 0), (cx, cy - r), (cx + 6, cy - r - 8), 3)
     return s
 
+def obter_sprite_menu(sprite_id):
+    """Retorna o sprite parado (olhando para baixo) de um personagem para o menu"""
+    # 0 = sprite_id, "baixo" = direção, "parado" = status, [0] = primeiro frame
+    return animacoes_por_sprite[sprite_id]["baixo"]["parado"][0]
+
+animacoes_por_sprite = {}
 
 def carregar_recursos():
-    global animacoes_player
+    global animacoes_por_sprite
 
-    # Tenta carregar spritesheet real; se não existir usa placeholders
-    try:
-        sheet = pygame.image.load("Assets/Players.png").convert_alpha()
+    arquivos_players = [
+        "Assets/Player1.png", 
+        "Assets/Player2.png", 
+        "Assets/Player3.png", 
+        "Assets/Player4.png"
+    ]
 
-        animacoes_player["direita"]["parado"].append(recortar_sprite(sheet, 0, 0))
-        animacoes_player["direita"]["andando"].append(recortar_sprite(sheet, 1, 0))
-        animacoes_player["direita"]["plantando"].append(recortar_sprite(sheet, 2, 0))
+    for sprite_id, arquivo in enumerate(arquivos_players):
+        animacoes = {
+            "direita": {"parado": [], "andando": [], "plantando": []},
+            "esquerda": {"parado": [], "andando": [], "plantando": []},
+            "baixo": {"parado": [], "andando": [], "plantando": []},
+            "cima": {"parado": [], "andando": [], "plantando": []},
+        }
+        
+        try:
+            sheet = pygame.image.load(arquivo).convert_alpha()
 
-        animacoes_player["esquerda"]["parado"].append(recortar_sprite(sheet, 0, 1))
-        animacoes_player["esquerda"]["andando"].append(recortar_sprite(sheet, 1, 1))
-        animacoes_player["esquerda"]["plantando"].append(recortar_sprite(sheet, 2, 1))
+            # Os mesmos recortes de antes, agora salvos no dicionário local 'animacoes'
+            animacoes["direita"]["parado"].append(recortar_sprite(sheet, 0, 0))
+            animacoes["direita"]["andando"].append(recortar_sprite(sheet, 1, 0))
+            animacoes["direita"]["plantando"].append(recortar_sprite(sheet, 2, 0))
 
-        animacoes_player["baixo"]["parado"].append(recortar_sprite(sheet, 5, 0))
-        animacoes_player["baixo"]["andando"].append(recortar_sprite(sheet, 6, 0))
-        animacoes_player["baixo"]["andando"].append(recortar_sprite(sheet, 6, 1))
+            animacoes["esquerda"]["parado"].append(recortar_sprite(sheet, 0, 1))
+            animacoes["esquerda"]["andando"].append(recortar_sprite(sheet, 1, 1))
+            animacoes["esquerda"]["plantando"].append(recortar_sprite(sheet, 2, 1))
 
-        animacoes_player["cima"]["parado"].append(recortar_sprite(sheet, 7, 0))
-        animacoes_player["cima"]["andando"].append(recortar_sprite(sheet, 8, 0))
-        animacoes_player["cima"]["andando"].append(recortar_sprite(sheet, 8, 1))
+            animacoes["baixo"]["parado"].append(recortar_sprite(sheet, 5, 0))
+            animacoes["baixo"]["andando"].append(recortar_sprite(sheet, 6, 0))
+            animacoes["baixo"]["andando"].append(recortar_sprite(sheet, 6, 1))
 
-    except (pygame.error, FileNotFoundError):
-        # Placeholder: quadrado azul para o jogador
-        placeholder = _fazer_sprite_solido((0, 0, 255))
-        for direcao in animacoes_player:
-            for acao in animacoes_player[direcao]:
-                animacoes_player[direcao][acao] = [placeholder]
+            animacoes["cima"]["parado"].append(recortar_sprite(sheet, 7, 0))
+            animacoes["cima"]["andando"].append(recortar_sprite(sheet, 8, 0))
+            animacoes["cima"]["andando"].append(recortar_sprite(sheet, 8, 1))
+
+        except (pygame.error, FileNotFoundError):
+            placeholder = _fazer_sprite_solido((0, 0, 255))
+            for direcao in animacoes:
+                for acao in animacoes[direcao]:
+                    animacoes[direcao][acao] = [placeholder]
+        
+        # Atribui o conjunto de animações carregado ao ID correspondente (0 a 3)
+        animacoes_por_sprite[sprite_id] = animacoes
 
     # Sprites do mapa
     sprites[config.VAZIO] = _fazer_sprite_solido((34, 139, 34))
