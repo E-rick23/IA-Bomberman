@@ -5,6 +5,12 @@ import config
 
 sprites = {}
 
+sprites_animados = {
+    "bomba": [],
+    "fogo": [],
+    "bloco_destruindo": []
+}
+
 animacoes_player = {
     "direita": {"parado": [], "andando": [], "plantando": []},
     "esquerda": {"parado": [], "andando": [], "plantando": []},
@@ -47,6 +53,53 @@ animacoes_por_sprite = {}
 
 def carregar_recursos():
     global animacoes_por_sprite
+
+    # 1. Carregar Bomba (48x16 -> 3 frames em linha)
+    sheet_bomba = pygame.image.load("Assets/Bomba.png").convert_alpha()
+    for i in range(3):
+        sprites_animados["bomba"].append(recortar_sprite(sheet_bomba, i, 0))
+
+    # 2. Carregar Tijolos (112x16 -> 7 frames em linha)
+    sheet_tijolo = pygame.image.load("Assets/Tijolo.png").convert_alpha()
+    # O frame [0] é estático e pode ir pro seu sprites[config.BLOCO_DESTRUTIVEL]
+    sprites[config.BLOCO_DESTRUTIVEL] = recortar_sprite(sheet_tijolo, 0, 0)
+    # Os frames de 1 a 6 são da animação quebrando
+    for i in range(7):
+        sprites_animados["bloco_destruindo"].append(recortar_sprite(sheet_tijolo, i, 0))
+
+    # 3. Carregar Fogo (160x160 -> 2 colunas x 2 linhas, cada um 80x80)
+    sheet_fogo = pygame.image.load("Assets/Fogo.png").convert_alpha()
+    # Criamos as chaves para cada parte específica do fogo
+    partes_fogo = [
+        "fogo_centro", "fogo_horizontal", "fogo_vertical", 
+        "fogo_cima", "fogo_baixo", "fogo_esq", "fogo_dir"
+    ]
+    for p in partes_fogo:
+        sprites_animados[p] = []
+            
+    for linha in range(2):
+        for col in range(2):
+            base_x = col * 80
+            base_y = linha * 80
+                        
+            # Função interna para pegar o quadrado 16x16 exato e redimensionar
+            def extrair_pedaco(px, py):
+                rect = pygame.Rect(base_x + px, base_y + py, 16, 16)
+                sub = sheet_fogo.subsurface(rect)
+                return pygame.transform.scale(sub, (config.TILE_SIZE, config.TILE_SIZE))
+            
+            # Centro da cruz (x=32, y=32)
+            sprites_animados["fogo_centro"].append(extrair_pedaco(32, 32))
+                        
+            # Corpos (meios da cruz)
+            sprites_animados["fogo_horizontal"].append(extrair_pedaco(16, 32))
+            sprites_animados["fogo_vertical"].append(extrair_pedaco(32, 16))
+                        
+            # Pontas extremas da cruz
+            sprites_animados["fogo_cima"].append(extrair_pedaco(32, 0))
+            sprites_animados["fogo_baixo"].append(extrair_pedaco(32, 64))
+            sprites_animados["fogo_esq"].append(extrair_pedaco(0, 32))
+            sprites_animados["fogo_dir"].append(extrair_pedaco(64, 32))
 
     arquivos_players = [
         "Assets/Player1.png", 

@@ -1,5 +1,6 @@
 import pygame
 import config
+import efeitos
 
 bombas_ativas: list["Bomba"] = []
 
@@ -10,50 +11,75 @@ class Bomba:
         self.raio = raio
         self.timer = tempo_explosao
         self.explodiu = False
+        self.sequencia_animacao = [0, 1, 2, 1]  # Vai do 1º ao 3º e volta pro 2º
+        self.indice_animacao = 0
+        self.timer_animacao = 0
+        self.tempo_por_frame = 200 # ms por frame da bomba
 
     def atualizar(self, dt, matriz):
-        """Diminui o timer usando o delta time (dt) do Pygame"""
         if not self.explodiu:
+            # Atualiza timer da explosão
             self.timer -= dt
+            
+            # Atualiza timer da animação visual
+            self.timer_animacao += dt
+            if self.timer_animacao >= self.tempo_por_frame:
+                self.timer_animacao = 0
+                self.indice_animacao = (self.indice_animacao + 1) % len(self.sequencia_animacao)
+    
             if self.timer <= 0:
                 self.calcular_explosao(matriz)
 
     def calcular_explosao(self, matriz):
-        """Propaga o fogo parando em paredes e destrindo blocos"""
-        self.explodiu = True
-        matriz[self.y][self.x] = config.FOGO
-
-        # Vetores de direção: (delta_y, delta_x)
-        direcoes = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-
-        for dy, dx in direcoes:
-            for passo in range(1, self.raio + 1):
-                alvo_y = self.y + (dy * passo)
-                alvo_x = self.x + (dx * passo)
-
-                # Verificando se esta dentro do mapa
-                if not (0 <= alvo_y < config.LINHAS and 0 <= alvo_x < config.COLUNAS):
-                    break
-
-                alvo = matriz[alvo_y][alvo_x]
-
-                # Verificando se bateu em uma parede fixa
-                if alvo == config.PAREDE:
-                    break
-
-                # Verificando se bateu em um bloco destrutível
-                elif alvo == config.BLOCO_DESTRUTIVEL:
-                    matriz[alvo_y][alvo_x] = config.VAZIO  # Destrói o bloco
-                    break  # O fogo para
-
-                # Caso o caminho esteja livre
-                else:
-                    # Mata jogadores que estiverem no fogo
-                    if alvo in (config.P1, config.P2, config.P3, config.P4):
-                        matriz[alvo_y][alvo_x] = config.FOGO
+            """Propaga o fogo parando em paredes e destruindo blocos"""
+            self.explodiu = True
+            seq_fogo = [0, 1, 2, 3, 2, 1, 0]
+            
+            # 1. Centro da explosão: limpa a matriz e adiciona o efeito do fogo
+            matriz[self.y][self.x] = config.VAZIO
+            efeitos.adicionar_efeito(self.y, self.x, "fogo_centro", seq_fogo, 80)
+            
+            # Mapeando os vetores para as peças visuais corretas: (dy, dx): ("Sprite Ponta", "Sprite Corpo")
+            direcoes = {
+                (-1, 0): ("fogo_cima", "fogo_vertical"),
+                (1, 0): ("fogo_baixo", "fogo_vertical"),
+                (0, -1): ("fogo_esq", "fogo_horizontal"),
+                (0, 1): ("fogo_dir", "fogo_horizontal")
+            }
+    
+            for (dy, dx), (tipo_ponta, tipo_corpo) in direcoes.items():
+                for passo in range(1, self.raio + 1):
+                    alvo_y = self.y + (dy * passo)
+                    alvo_x = self.x + (dx * passo)
+    
+                    # Verificando se esta dentro do mapa
+                    if not (0 <= alvo_y < config.LINHAS and 0 <= alvo_x < config.COLUNAS):
+                        break
+    
+                    alvo = matriz[alvo_y][alvo_x]
+    
+                    # Verificando se bateu em uma parede fixa
+                    if alvo == config.PAREDE:
+                        break
+    
+                    # Verificando se bateu em um bloco destrutível
+                    elif alvo == config.BLOCO_DESTRUTIVEL:
+                        matriz[alvo_y][alvo_x] = config.VAZIO  # Destrói o bloco
+                        # Dispara a animação do tijolo destruindo (frames 1 até 6)
+                        efeitos.adicionar_efeito(alvo_y, alvo_x, "bloco_destruindo", [1, 2, 3, 4, 5, 6], 100)
+                        break
+    
+                    # Caso o caminho esteja livre (inclui jogadores)
                     else:
-                        matriz[alvo_y][alvo_x] = config.FOGO
+                        # Sobrescreve com VAZIO. Isso automaticamente "mata" jogadores, 
+                        # pois o método _verificar_morte deles identifica que o ID sumiu.
+                        matriz[alvo_y][alvo_x] = config.VAZIO
 
+                        # Decide qual sprite usar: se for o último passo da explosão, usa a ponta.
+                        tipo_fogo = tipo_ponta if passo == self.raio else tipo_corpo
+                         # Adiciona a animação visual do fogo expandindo                    
+                        efeitos.adicionar_efeito(alvo_y, alvo_x, tipo_fogo, seq_fogo, 80)
+                       
     def desenhar(self, tela, sprite_bomba):
         """Desenhar a bomba na tela"""
         if not self.explodiu:
