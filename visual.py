@@ -36,14 +36,6 @@ def _fazer_sprite_solido(cor):
     return pygame.transform.scale(s, (config.TILE_SIZE, config.TILE_SIZE))
 
 
-def _fazer_sprite_bomba():
-    s = pygame.Surface((config.TILE_SIZE, config.TILE_SIZE), pygame.SRCALPHA)
-    cx, cy, r = config.TILE_SIZE // 2, config.TILE_SIZE // 2, config.TILE_SIZE // 2 - 4
-    pygame.draw.circle(s, (20, 20, 20), (cx, cy), r)
-    # Pavio
-    pygame.draw.line(s, (200, 100, 0), (cx, cy - r), (cx + 6, cy - r - 8), 3)
-    return s
-
 def obter_sprite_menu(sprite_id):
     """Retorna o sprite parado (olhando para baixo) de um personagem para o menu"""
     # 0 = sprite_id, "baixo" = direção, "parado" = status, [0] = primeiro frame
@@ -150,7 +142,6 @@ def carregar_recursos():
     sprites[config.PAREDE] = _fazer_sprite_solido((128, 128, 128))
     sprites[config.FOGO] = _fazer_sprite_solido((255, 69, 0))
     sprites[config.BLOCO_DESTRUTIVEL] = _fazer_sprite_solido((139, 69, 19))
-    sprites[config.BOMBA] = _fazer_sprite_bomba()
 
 
 def desenhar_mapa(tela, matriz):
@@ -166,8 +157,6 @@ def desenhar_mapa(tela, matriz):
                 tela.blit(sprites[config.PAREDE], pos)
             elif celula == config.BLOCO_DESTRUTIVEL:
                 tela.blit(sprites[config.BLOCO_DESTRUTIVEL], pos)
-            elif celula == config.BOMBA:
-                tela.blit(sprites[config.BOMBA], pos)
             elif celula == config.FOGO:
                 tela.blit(sprites[config.FOGO], pos)
                 #sleep(0.1)  # Pequena pausa para destacar o fogo

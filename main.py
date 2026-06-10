@@ -4,6 +4,7 @@ import config
 import mapgenerator
 import visual
 import bombas
+import efeitos
 from player import Player
 from menu import Menu
 
@@ -73,6 +74,7 @@ def main():
                 jogador.processar_input(evento, tabuleiro)
 
         bombas.atualizar_bombas(tabuleiro, dt)
+        efeitos.atualizar_efeitos(dt) # Atualiza timers do fogo e dos tijolos quebrando
 
         # Atualiza o estado lógico e passa o novo dicionário compartilhado de sprites
         for jogador in jogadores:
@@ -84,6 +86,9 @@ def main():
             pygame.Rect(0, HUD_H, largura, config.LINHAS * config.TILE_SIZE)
         )
         visual.desenhar_mapa(mapa_surface, tabuleiro)
+
+        # Desenhar efeitos (fogo, tijolos quebrando)
+        efeitos.desenhar_efeitos(mapa_surface, visual.sprites_animados)
 
         rodando = False
         for jogador in jogadores:
@@ -102,7 +107,9 @@ def main():
             if not b.explodiu:
                 pos_x = b.x * config.TILE_SIZE
                 pos_y = b.y * config.TILE_SIZE + HUD_H
-                tela.blit(visual.sprites[config.BOMBA], (pos_x, pos_y))
+                frame_idx = b.sequencia_animacao[b.indice_animacao]
+                sprite_atual = visual.sprites_animados["bomba"][frame_idx]
+                tela.blit(sprite_atual, (pos_x, pos_y))
 
         visual.desenhar_hud(tela, jogadores)
 
