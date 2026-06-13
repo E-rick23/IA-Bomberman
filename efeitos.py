@@ -37,7 +37,8 @@ class EfeitoVisual:
     def desenhar(self, tela, dicionario_sprites):
         if not self.concluido:
             # Pega o frame atual com base na sequência definida
-            sprite = self.frames[self.frame_atual]
+            indice_sprite = self.frames[self.frame_atual]
+            sprite = dicionario_sprites[self.tipo][indice_sprite]
             pos_x = self.x * config.TILE_SIZE
             pos_y = self.y * config.TILE_SIZE
             tela.blit(sprite, (pos_x, pos_y))
