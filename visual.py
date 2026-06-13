@@ -48,15 +48,12 @@ def _carregar_sprites_tijolo():
 def _carregar_sprites_fogo():
     sheet_fogo = pygame.image.load("Assets/Fogo.png").convert_alpha()
 
-    fogo = {
-        "centro": [],
-        "horizontal": [],
-        "vertical": [],
-        "cima": [],
-        "baixo": [],
-        "esquerda": [],
-        "direita": [],
-    }
+    partes_fogo = [
+        "fogo_centro", "fogo_horizontal", "fogo_vertical", 
+        "fogo_cima", "fogo_baixo", "fogo_esq", "fogo_dir"
+    ]
+    for p in partes_fogo:
+        sprites_animados[p] = []
 
     for linha in range(2):
         for col in range(2):
@@ -67,15 +64,19 @@ def _carregar_sprites_fogo():
                 sub = sheet_fogo.subsurface(rect)
                 return pygame.transform.scale(sub, (config.TILE_SIZE, config.TILE_SIZE))
 
-            fogo["centro"].append(extrair(32, 32))
-            fogo["horizontal"].append(extrair(16, 32))
-            fogo["vertical"].append(extrair(32, 16))
-            fogo["cima"].append(extrair(32, 0))
-            fogo["baixo"].append(extrair(32, 64))
-            fogo["esquerda"].append(extrair(0, 32))
-            fogo["direita"].append(extrair(64, 32))
+            # Centro da cruz (x=32, y=32)
+            sprites_animados["fogo_centro"].append(extrair(32, 32))
+                        
+            # Corpos (meios da cruz)
+            sprites_animados["fogo_horizontal"].append(extrair(16, 32))
+            sprites_animados["fogo_vertical"].append(extrair(32, 16))
+                        
+            # Pontas extremas da cruz
+            sprites_animados["fogo_cima"].append(extrair(32, 0))
+            sprites_animados["fogo_baixo"].append(extrair(32, 64))
+            sprites_animados["fogo_esq"].append(extrair(0, 32))
+            sprites_animados["fogo_dir"].append(extrair(64, 32))
             
-    sprites_animados["fogo"] = fogo
 
 
 def _carregar_sprites_jogadores():
