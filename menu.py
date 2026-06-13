@@ -162,25 +162,45 @@ class Menu:
             confirmado = False
             while not confirmado:
                 self.tela.fill(PRETO)
-                self.desenhar_texto(f"JOGADOR {p+1}: ESCOLHA SEU HEROI", self.fonte_titulo, BRANCO, self.largura // 2, 80)
-                
+                self.desenhar_texto(
+                    f"JOGADOR {p+1}: ESCOLHA SEU HERÓI",
+                    self.fonte_titulo,
+                    BRANCO,
+                    self.largura // 2,
+                    80,
+                )
+
+                # Lista para guardar os retângulos de colisão de cada personagem
+                retangulos_personagens = []
+
                 # Desenhar os 4 personagens lado a lado
                 for i in range(4):
                     sprite = visual.obter_sprite_menu(i)
                     x = (self.largura // 5) * (i + 1)
                     y = self.altura // 2
-                    
+
+                    # Criar um retângulo para a área do personagem (80x80)
+                    rect_personagem = pygame.Rect(x - 40, y - 40, 80, 80)
+                    retangulos_personagens.append(rect_personagem)
+
                     # Destaque para o que está focado
                     if i == selecionado:
-                        pygame.draw.rect(self.tela, AZUL_SELECIONADO, (x - 40, y - 40, 80, 80), 3)
-                    
-                    self.tela.blit(sprite, (x - config.TILE_SIZE//2, y - config.TILE_SIZE//2))
-                
-                self.desenhar_texto("< SETAS PARA MOVER | ENTER PARA CONFIRMAR >", self.fonte_opcoes, CINZA, self.largura // 2, 400)
+                        pygame.draw.rect(
+                            self.tela, AZUL_SELECIONADO, rect_personagem, 3
+                        )
+
+                    self.tela.blit(
+                        sprite, (x - config.TILE_SIZE // 2, y - config.TILE_SIZE // 2)
+                    )
+
                 pygame.display.flip()
 
                 for evento in pygame.event.get():
-                    if evento.type == pygame.KEYDOWN:
+                    if evento.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+
+                    elif evento.type == pygame.KEYDOWN:
                         if evento.key == pygame.K_LEFT:
                             selecionado = (selecionado - 1) % 4
                         elif evento.key == pygame.K_RIGHT:
@@ -188,5 +208,20 @@ class Menu:
                         elif evento.key == pygame.K_RETURN:
                             escolhas.append(selecionado)
                             confirmado = True
+
+                    # Efeito Hover para mudar a seleção quando o mouse passar por cima
+                    elif evento.type == pygame.MOUSEMOTION:
+                        pos = pygame.mouse.get_pos()
+                        for i, rect in enumerate(retangulos_personagens):
+                            if rect.collidepoint(pos):
+                                selecionado = i
+
+                    elif evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
+                        pos = pygame.mouse.get_pos()
+                        for i, rect in enumerate(retangulos_personagens):
+                            if rect.collidepoint(pos):
+                                selecionado = i
+                                escolhas.append(selecionado)
+                                confirmado = True
+
         return escolhas
-    
