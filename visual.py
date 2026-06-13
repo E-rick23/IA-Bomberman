@@ -24,7 +24,7 @@ def obter_sprite_menu(sprite_id):
 
 def _carregar_sprites_bomba():
     sheet_bomba = pygame.image.load("Assets/Bomba.png").convert_alpha()
-    bomba = {}
+    bomba = []
     for i in range(3):
         bomba.append(recortar_sprite(sheet_bomba, i, 0))
     
@@ -37,7 +37,7 @@ def _carregar_sprites_tijolo():
     sprites[config.PAREDE] = recortar_sprite(sheet_tijolo, 0, 0)
     sprites[config.BLOCO_DESTRUTIVEL] = recortar_sprite(sheet_tijolo, 1, 0)
     
-    bloco_destruindo = {}
+    bloco_destruindo = []
     
     for i in range(7):
         bloco_destruindo.append(recortar_sprite(sheet_tijolo, i, 0))
