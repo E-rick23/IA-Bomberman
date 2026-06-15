@@ -5,8 +5,10 @@ import mapgenerator
 import visual
 import bombas
 import efeitos
+import random
 from player import Player
 from menu import Menu
+from inimigo import Inimigo
 
 
 def main():
@@ -83,8 +85,27 @@ def main():
             ),
         ]
 
-        # Filtra apenas a quantidade selecionada no menu
+
         jogadores = pool_jogadores[:qtd_jogadores]
+
+        posicoes_vazias = []
+
+        for y in range(config.LINHAS):
+            for x in range(config.COLUNAS):
+                if tabuleiro[y][x] == config.VAZIO:
+                    posicoes_vazias.append((y, x))
+        
+        random.shuffle(posicoes_vazias)
+        
+        inimigos = []
+        if len(posicoes_vazias) > 0:
+            y, x = posicoes_vazias.pop()
+            inimigos.append(Inimigo(y, x, id_inimigo=9, algoritmo=""))
+            tabuleiro[y][x] = 9
+        if len(posicoes_vazias) > 0:
+            y, x = posicoes_vazias.pop()
+            inimigos.append(Inimigo(y, x, id_inimigo=10, algoritmo=""))
+            tabuleiro[y][x] = 10
 
         rodando = True
         acao_pos_jogo = (
@@ -100,6 +121,16 @@ def main():
 
             for jogador in jogadores:
                 jogador.atualizar(dt, tabuleiro, visual.animacoes_por_sprite)
+
+            alvo_atual = None
+            for j in jogadores:
+                if j.vivo:
+                    alvo_atual = j
+                    break
+
+            if alvo_atual:
+                for inimigo in inimigos:
+                    inimigo.atualizar(dt, tabuleiro, alvo_atual)
 
             tela.fill((0, 0, 0))
 
@@ -129,6 +160,13 @@ def main():
                     1000
                 )
                 rodando = False
+
+            for inimigo in inimigos:
+                if inimigo.vivo:
+                    pos_x = inimigo.x * config.TILE_SIZE
+                    pos_y = inimigo.y * config.TILE_SIZE + HUD_H
+                    pygame.draw.rect(tela, (255, 50, 50), (pos_x, pos_y, config.TILE_SIZE, config.TILE_SIZE))
+                    pygame.draw.rect(tela, (0, 0, 0), (pos_x, pos_y, config.TILE_SIZE, config.TILE_SIZE), 2)
 
             for b in bombas.bombas_ativas:
                 if not b.explodiu:
