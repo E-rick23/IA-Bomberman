@@ -23,7 +23,7 @@ def tem_linha_de_visao(matriz, y1, x1, y2, x2): # Verifica se o player está na 
 
 
 class Inimigo:
-    def __init__(self, y, x, id_inimigo, algoritmo="a_estrela"):
+    def __init__(self, y, x, id_inimigo, algoritmo="BFS"):
         self.y = y
         self.x = x
         self.id = id_inimigo
@@ -64,13 +64,13 @@ class Inimigo:
 
         if self.estado == "PERSEGUINDO":
             if self.ultimo_local_visto:
-                if self.algoritmo == "bfs":
+                if self.algoritmo == "BFS":
                     caminho = busca_bfs(matriz, (self.y, self.x), self.ultimo_local_visto)
-                elif self.algoritmo == "dfs":
+                elif self.algoritmo == "DFS":
                     caminho = busca_dfs(matriz, (self.y, self.x), self.ultimo_local_visto)
-                elif self.algoritmo == "busca_gulosa":
+                elif self.algoritmo == "Busca Gulosa":
                     caminho = busca_gulosa(matriz, (self.y, self.x), self.ultimo_local_visto)
-                else:
+                elif self.algoritmo == "A*":
                     caminho = busca_a_estrela(matriz, (self.y, self.x), self.ultimo_local_visto)
 
                 if caminho and len(caminho) > 1:
