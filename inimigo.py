@@ -26,6 +26,8 @@ class Inimigo:
         self.y = y
         self.x = x
         self.id = id_inimigo
+        self.visual_x = self.x * config.TILE_SIZE 
+        self.visual_y = self.y * config.TILE_SIZE
         self.vivo = True
         self.algoritmo = algoritmo
         self.timer_movimento = 0
@@ -42,6 +44,12 @@ class Inimigo:
         if not self.vivo:
             return
 
+        # Suavização do Movimento Visual
+        alvo_x = self.x * config.TILE_SIZE
+        alvo_y = self.y * config.TILE_SIZE
+        self.visual_x += (alvo_x - self.visual_x) * 0.2 # Inimigos podem deslizar um pouco mais lento
+        self.visual_y += (alvo_y - self.visual_y) * 0.2
+        
         self.timer_movimento += dt
         if self.timer_movimento >= self.tempo_por_passo:
             self.timer_movimento = 0

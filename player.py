@@ -41,6 +41,8 @@ class Player:
         self.y = y
         self.x = x
         self.id = player_id
+        self.visual_x = self.x * TILE_SIZE 
+        self.visual_y = self.y * TILE_SIZE
         self.sprite_id = sprite_id
         self.direcao = "baixo"
         self.status = "parado"
@@ -77,11 +79,11 @@ class Player:
                 if 0 <= alvo_y < LINHAS and 0 <= alvo_x < COLUNAS:
                     alvo = matriz[alvo_y][alvo_x]
                                     
-                # Se a célula tiver algo que NÃO seja o cenário padrão ou outros players, é um inimigo!
-                if alvo not in (VAZIO, PAREDE, BLOCO_DESTRUTIVEL, BOMBA, FOGO, P1, P2, P3, P4):
-                    self.vivo = False
-                    matriz[self.y][self.x] = VAZIO # Limpa o player da matriz
-                    return # Encerra o input
+                    # Se a célula tiver algo que NÃO seja o cenário padrão ou outros players, é um inimigo!
+                    if alvo not in (VAZIO, PAREDE, BLOCO_DESTRUTIVEL, BOMBA, FOGO, P1, P2, P3, P4):
+                        self.vivo = False
+                        matriz[self.y][self.x] = VAZIO # Limpa o player da matriz
+                        return # Encerra o input
                                 
                 # Se não encostou em um inimigo, tenta realizar o movimento
                 self.y, self.x = movimento.tentar_mover(
@@ -116,6 +118,14 @@ class Player:
         """Atualiza animação e verifica se o jogador foi atingido"""
         self._atualizar_animacao(dt, animacoes)
         self._verificar_morte(matriz)
+
+        # Suavização do Movimento Visual
+        alvo_x = self.x * TILE_SIZE
+        alvo_y = self.y * TILE_SIZE
+                
+        # O fator 0.3 define a "velocidade do deslize". Quanto mais perto de 1, mais duro.
+        self.visual_x += (alvo_x - self.visual_x) * 0.3
+        self.visual_y += (alvo_y - self.visual_y) * 0.3
 
     def _atualizar_animacao(self, dt, animacoes):
         if self.status == "andando":

@@ -131,8 +131,8 @@ def main():
             algum_vivo = False
             for jogador in jogadores:
                 if jogador.vivo:
-                    pos_x = jogador.x * config.TILE_SIZE
-                    pos_y = jogador.y * config.TILE_SIZE + HUD_H
+                    pos_x = jogador.visual_x
+                    pos_y = jogador.visual_y + HUD_H
                     frame = jogador.frame_atual if jogador.status == "andando" else 0
 
                     lista = visual.animacoes_por_sprite[jogador.sprite_id][
@@ -170,11 +170,11 @@ def main():
 
             for inimigo in inimigos:
                 if inimigo.vivo:
-                    pos_x = inimigo.x * config.TILE_SIZE
-                    pos_y = inimigo.y * config.TILE_SIZE + HUD_H
+                    pos_x = inimigo.visual_x
+                    pos_y = inimigo.visual_y + HUD_H
 
                     lista = visual.animacoes_por_sprite["inimigos"][inimigo.algoritmo]
-                    sprite = lista[(pos_x + pos_y) % len(lista)]
+                    sprite = lista[int(pos_x + pos_y) % len(lista)]
                     tela.blit(sprite, (pos_x, pos_y))
 
             for b in bombas.bombas_ativas:
