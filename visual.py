@@ -131,16 +131,18 @@ def _carregar_sprites_jogadores():
 def _carregar_sprites_inimigos():
     sheet_inimigos = pygame.image.load("Assets/Inimigos.png").convert_alpha()
 
-    linha = 1
-    # 1,4,5,6
+    linhas = [1, 4, 5, 6]
+    algoritmos = ["BFS", "DFS", "A*", "Busca Gulosa"]
+    
+    dicionario_sprites = {} 
+    
+    for linha, algoritmo in zip(linhas, algoritmos):
+        dicionario_sprites[algoritmo] = []
+        for i in range(6):
+            sprite_recortado = recortar_sprite(sheet_inimigos, i, linha)
+            dicionario_sprites[algoritmo].append(sprite_recortado)
 
-    inimigos = []
-
-    for i in range(6):
-        inimigos.append(recortar_sprite(sheet_inimigos, i, linha))
-
-    animacoes_por_sprite["inimigos"] = inimigos
-
+    animacoes_por_sprite["inimigos"] = dicionario_sprites
 
 def carregar_recursos():
     """Função principal que chama todos os sprites"""

@@ -152,7 +152,7 @@ def main():
                     pos_x = inimigo.x * config.TILE_SIZE
                     pos_y = inimigo.y * config.TILE_SIZE + HUD_H
 
-                    lista = visual.animacoes_por_sprite["inimigos"]
+                    lista = visual.animacoes_por_sprite["inimigos"][inimigo.algoritmo]
                     sprite = lista[(pos_x + pos_y) % len(lista)]
                     tela.blit(sprite, (pos_x, pos_y))
 
