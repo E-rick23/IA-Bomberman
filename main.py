@@ -147,6 +147,44 @@ def main():
                 pygame.time.delay(1000)
                 rodando = False
 
+            # 'any' verifica se existe pelo menos um inimigo vivo. 
+            # 'not any' significa que todos estão mortos.
+            if inimigos and not any(inimigo.vivo for inimigo in inimigos):
+                # Cria as fontes
+                fonte_vitoria = pygame.font.SysFont("Arial", 55, bold=True)
+                fonte_instrucao = pygame.font.SysFont("Arial", 20, bold=False)
+                            
+                # Renderiza o texto (Texto, Antialiasing, Cor RGB)
+                texto_vit = fonte_vitoria.render("VITÓRIA!", True, (0, 255, 0)) # Verde
+                texto_btn = fonte_instrucao.render("Pressione qualquer botão para voltar ao menu", True, (255, 255, 255)) # Branco
+                            
+                aguardando_input = True
+                while aguardando_input:
+                    #Calcula as coordenadas para centralizar o texto                    pos_x_vit = (largura - texto_vit.get_width()) // 2
+                    pos_x_vit = (largura - texto_vit.get_width()) // 2
+                    pos_y_vit = (altura - texto_vit.get_height()) // 2 - 20
+                    
+                    pos_x_btn = (largura - texto_btn.get_width()) // 2
+                    pos_y_btn = pos_y_vit + 65
+                    
+                    # Desenha as mensagens por cima do estado atual do mapa
+                    tela.blit(texto_vit, (pos_x_vit, pos_y_vit))
+                    tela.blit(texto_btn, (pos_x_btn, pos_y_btn))
+                    pygame.display.flip()
+                    
+                    # Captura os eventos dentro deste loop de espera
+                    for evento in pygame.event.get():
+                        # Se fechar a janela no 'X', encerra o jogo por completo
+                        if evento.type == pygame.QUIT:
+                            aguardando_input = False
+                            rodando = False
+                            acao_pos_jogo = "fechar"
+                        
+                        # Se pressionar uma tecla ou botão do mouse, sai do loop e vai para o menu
+                        elif evento.type == pygame.KEYDOWN or evento.type == pygame.MOUSEBUTTONDOWN:
+                            aguardando_input = False
+                            rodando = False # Termina a partida (volta ao menu principal)
+
             for inimigo in inimigos:
                 if inimigo.vivo and inimigo.caminho_atual:
                     # Cria uma superfície com canal Alpha (transparência)
