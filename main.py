@@ -1,3 +1,5 @@
+import random
+
 import pygame
 import sys
 import config
@@ -5,7 +7,6 @@ import mapgenerator
 import visual
 import bombas
 import efeitos
-import random
 from player import Player
 from menu import Menu
 from inimigo import Inimigo
@@ -29,10 +30,11 @@ def main():
         config.LINHAS = config_escolhida["tamanho"]
         config.COLUNAS = config_escolhida["tamanho"]
         qtd_jogadores = config_escolhida["players"]
-        dificuldade = config_escolhida["dificuldade"]
-
+        qtd_inimigos = config_escolhida["inimigos"]
+        algoritmo_inimigos = config_escolhida["algoritmo_inimigos"]
+        
         print(
-            f"Iniciando mapa {config.LINHAS}x{config.COLUNAS} com {qtd_jogadores} players na dificuldade '{dificuldade}'"
+            f"Iniciando mapa {config.LINHAS}x{config.COLUNAS} com {qtd_jogadores} players com {qtd_inimigos} inimigos com os motores de {algoritmo_inimigos}"
         )
 
         # Carrega as animações e sprites antes da seleção para que a UI possa exibir o preview dos heróis
@@ -53,7 +55,8 @@ def main():
         tabuleiro = mapgenerator.criar_matriz_vazia()
         mapgenerator.gerar_pilares(tabuleiro)
         mapgenerator.espalhar_blocos(tabuleiro, densidade=0.60)
-        mapgenerator.posicionar_jogadores(tabuleiro)
+        mapgenerator.posicionar_jogadores(tabuleiro, qtd_jogadores)
+        posicoes_inimigos = mapgenerator.posicionar_inimigos(tabuleiro, qtd_inimigos)
 
         L, C = config.LINHAS - 1, config.COLUNAS - 1
 
@@ -85,27 +88,9 @@ def main():
             ),
         ]
 
-
+        print(posicoes_inimigos)
+        inimigos = [Inimigo(posicao[0], posicao[1], 9) for posicao in posicoes_inimigos]      
         jogadores = pool_jogadores[:qtd_jogadores]
-
-        posicoes_vazias = []
-
-        for y in range(config.LINHAS):
-            for x in range(config.COLUNAS):
-                if tabuleiro[y][x] == config.VAZIO:
-                    posicoes_vazias.append((y, x))
-        
-        random.shuffle(posicoes_vazias)
-        
-        inimigos = []
-        if len(posicoes_vazias) > 0:
-            y, x = posicoes_vazias.pop()
-            inimigos.append(Inimigo(y, x, id_inimigo=9, algoritmo=""))
-            tabuleiro[y][x] = 9
-        if len(posicoes_vazias) > 0:
-            y, x = posicoes_vazias.pop()
-            inimigos.append(Inimigo(y, x, id_inimigo=10, algoritmo=""))
-            tabuleiro[y][x] = 10
 
         rodando = True
         acao_pos_jogo = (

@@ -56,3 +56,17 @@ def posicionar_jogadores(matriz, qtd_jogadores):
         matriz[L][0] = config.P3  # Inferior Esquerdo
     if qtd_jogadores > 3:
         matriz[L][C] = config.P4  # Inferior Direito
+
+def posicionar_inimigos(matriz, qtd_inimigos):
+    inimigos = []
+
+    for _ in range(qtd_inimigos):
+        x = random.randint(1, config.COLUNAS-1)
+        y = random.randint(1, config.LINHAS-1)
+        if(x % 2 != 0 and y % 2 != 0):
+            matriz[y][x] = 9
+            inimigos.append([x,y])
+        else:
+            qtd_inimigos =+ 1
+    
+    return inimigos

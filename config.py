@@ -15,6 +15,9 @@ P2 = 5
 P3 = 6
 P4 = 7
 
+# Inimigo
+INIMIGO = 9
+
 # Variáveis do pygame
 
 # Dimensões do sprite

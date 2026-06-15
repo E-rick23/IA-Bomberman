@@ -25,16 +25,20 @@ class Menu:
         # Opções dos seletores
         self.tamanhos_mapa = [9, 11, 13, 15]
         self.tamanho = 0
-
-        self.qtd_players = [2, 3, 4]
+    
+        self.qtd_players = [1, 2, 3, 4]
         self.players = 0
 
-        self.dificuldades = [
-            "Fácil",
-            "Médio",
-            "Difícil",
-        ]  # Felipe menionou algo de dificuldade no pitch depois vejo sobre
-        self.dificuldade = 0
+        self.qtd_inimigos = [1, 2, 3, 4]
+        self.inimigos = 0
+        
+        self.algoritmo_inimigos = [
+            "BFS",
+            "DFS",
+            "A*",
+            "Busca Gulosa"
+        ]
+        self.algoritmo = 0
 
         # Índice do botão (0=Tamanho, 1=Players, 2=Dificuldade, 3=Jogar)
         self.opcao_focada = 0
@@ -60,8 +64,9 @@ class Menu:
             # Cores de destaque baseadas no foco do teclado/mouse
             cor_tamanho = AZUL_SELECIONADO if self.opcao_focada == 0 else BRANCO
             cor_players = AZUL_SELECIONADO if self.opcao_focada == 1 else BRANCO
-            cor_dificuldade = AZUL_SELECIONADO if self.opcao_focada == 2 else BRANCO
-            cor_jogar = AZUL_SELECIONADO if self.opcao_focada == 3 else CINZA
+            cor_inimigos = AZUL_SELECIONADO if self.opcao_focada == 2 else BRANCO
+            cor_algoritmo_inimigos = AZUL_SELECIONADO if self.opcao_focada == 3 else BRANCO
+            cor_jogar = AZUL_SELECIONADO if self.opcao_focada == 4 else CINZA
 
             # Renderizar Seletores
             txt_tamanho = f"Tamanho do Mapa:  <  {self.tamanhos_mapa[self.tamanho]}x{self.tamanhos_mapa[self.tamanho]}  >"
@@ -75,21 +80,28 @@ class Menu:
             rect_players = self.desenhar_texto(
                 txt_players, self.fonte_opcoes, cor_players, self.largura // 2, 220
             )
-
-            txt_dificuldade = (
-                f"Dificuldade (IA futuro):  <  {self.dificuldades[self.dificuldade]}  >"
+            
+            txt_inimigos = (
+                f"Quantidade de Inimigos:  <  {self.qtd_inimigos[self.inimigos]}  >"
             )
-            rect_dificuldade = self.desenhar_texto(
-                txt_dificuldade,
+            rect_inimigos = self.desenhar_texto(
+                txt_inimigos, self.fonte_opcoes, cor_inimigos, self.largura // 2, 280
+            )
+
+            txt_algoritmo_inimigos = (
+                f"Algoritmo dos inimigos:  <  {self.algoritmo_inimigos[self.algoritmo]}  >"
+            )
+            rect_algoritmo_inimigos = self.desenhar_texto(
+                txt_algoritmo_inimigos,
                 self.fonte_opcoes,
-                cor_dificuldade,
+                cor_algoritmo_inimigos,
                 self.largura // 2,
-                280,
+                340,
             )
 
             # Botão Jogar
             rect_jogar = self.desenhar_texto(
-                "[ INICIAR JOGO ]", self.fonte_titulo, cor_jogar, self.largura // 2, 380
+                "[ INICIAR JOGO ]", self.fonte_titulo, cor_jogar, self.largura // 2, 440
             )
 
             pygame.display.flip()
@@ -114,6 +126,8 @@ class Menu:
                         elif self.opcao_focada == 1:
                             self.players = (self.players - 1) % len(self.qtd_players)
                         elif self.opcao_focada == 2:
+                            self.inimigos = (self.inimigos - 1) % len(self.qtd_inimigos)
+                        elif self.opcao_focada == 3:
                             self.dificuldade = (self.dificuldade - 1) % len(
                                 self.dificuldades
                             )
@@ -124,6 +138,8 @@ class Menu:
                         elif self.opcao_focada == 1:
                             self.players = (self.players + 1) % len(self.qtd_players)
                         elif self.opcao_focada == 2:
+                            self.inimigos = (self.inimigos + 1) % len(self.qtd_inimigos)
+                        elif self.opcao_focada == 3:
                             self.dificuldade = (self.dificuldade + 1) % len(
                                 self.dificuldades
                             )
@@ -143,16 +159,19 @@ class Menu:
                         self.tamanho = (self.tamanho + 1) % len(self.tamanhos_mapa)
                     if rect_players.collidepoint(pos):
                         self.players = (self.players + 1) % len(self.qtd_players)
-                    if rect_dificuldade.collidepoint(pos):
-                        self.dificuldade = (self.dificuldade + 1) % len(
-                            self.dificuldades
+                    if rect_inimigos.collidepoint(pos):
+                        self.inimigos = (self.inimigos + 1) % len(self.qtd_inimigos)
+                    if rect_algoritmo_inimigos.collidepoint(pos):
+                        self.algoritmo = (self.algoritmo + 1) % len(
+                            self.algoritmo_inimigos
                         )
 
     def coletar_configuracoes(self):
         return {
             "tamanho": self.tamanhos_mapa[self.tamanho],
             "players": self.qtd_players[self.players],
-            "dificuldade": self.dificuldades[self.dificuldade],
+            "inimigos": self.qtd_inimigos[self.inimigos],
+            "algoritmo_inimigos": self.algoritmo_inimigos[self.algoritmo],
         }
 
     def selecionar_personagens(self, qtd_players):
