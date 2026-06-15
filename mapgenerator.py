@@ -44,12 +44,15 @@ def espalhar_blocos(matriz, densidade=0.6):
                     matriz[y][x] = config.BLOCO_DESTRUTIVEL
 
 
-def posicionar_jogadores(matriz):
+def posicionar_jogadores(matriz, qtd_jogadores):
     """Posiciona os jogadores nos cantos do mapa"""
 
     L = config.LINHAS - 1
     C = config.COLUNAS - 1
     matriz[0][0] = config.P1  # Superior Esquerdo
-    matriz[0][C] = config.P2  # Superior Direito
-    matriz[L][0] = config.P3  # Inferior Esquerdo
-    matriz[L][C] = config.P4  # Inferior Direito
+    if qtd_jogadores > 1:
+        matriz[0][C] = config.P2  # Superior Direito
+    if qtd_jogadores > 2:
+        matriz[L][0] = config.P3  # Inferior Esquerdo
+    if qtd_jogadores > 3:
+        matriz[L][C] = config.P4  # Inferior Direito
