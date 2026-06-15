@@ -1,9 +1,9 @@
-# IA-Bomberman
+# Bombásticos
 
 **Disciplina:** Introdução à Inteligência Artificial  
-**Semestre:** 2025.1  
-**Professor:** [Nome do Professor]  
-**Turma:** [T0X]
+**Semestre:** 2026.1  
+**Professor:** [André Fonseca]  
+**Turma:** [T02]
 
 ## Integrantes do Grupo
 
@@ -14,7 +14,7 @@
 
 ## Descrição do Projeto
 
-O **IA-Bomberman** é uma recriação do clássico jogo Bomberman desenvolvida em Python com Pygame, com foco na implementação e comparação de algoritmos de busca em Inteligência Artificial. O projeto permite que o jogador enfrente inimigos controlados por agentes inteligentes que utilizam diferentes estratégias de navegação no mapa para perseguir o jogador.
+O projeto do grupo **Bombásticos** é uma recriação do clássico jogo Bomberman desenvolvida em Python com Pygame, com foco na implementação e comparação de algoritmos de busca em Inteligência Artificial. O projeto permite que o jogador enfrente inimigos controlados por agentes inteligentes que utilizam diferentes estratégias de navegação no mapa para perseguir o jogador.
 
 Os inimigos podem ser configurados para usar quatro motores de busca distintos — **BFS** (Busca em Largura), **DFS** (Busca em Profundidade), **Busca Gulosa** e **A\*** — permitindo observar na prática as diferenças de comportamento, eficiência e trajetória de cada algoritmo em um ambiente de jogo dinâmico. As tecnologias utilizadas são Python 3, Pygame (renderização e lógica do jogo) e NumPy.
 
