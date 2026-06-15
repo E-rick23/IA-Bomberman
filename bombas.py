@@ -68,7 +68,23 @@ class Bomba:
                         # Dispara a animação do tijolo destruindo (frames 1 até 6)
                         efeitos.adicionar_efeito(alvo_y, alvo_x, "bloco_destruindo", [1, 2, 3, 4, 5, 6], 100)
                         break
-    
+                    
+                    elif alvo == config.BOMBA:
+                        for outra_bomba in bombas_ativas:
+                            if outra_bomba.y == alvo_y and outra_bomba.x == alvo_x and not outra_bomba.explodiu:
+                                
+                                # Calcula um tempo de detonação baseado na distância (100ms por bloco)
+                                atraso_cascata = passo * 100
+                                
+                                # Reduz o timer da bomba atingida APENAS se o novo tempo 
+                                # for menor que o tempo que ela já tinha para explodir naturalmente
+                                if outra_bomba.timer > atraso_cascata:
+                                    outra_bomba.timer = atraso_cascata
+                                    
+                                break
+                        
+                        # O fogo desta bomba PARA aqui
+                        break
                     # Caso o caminho esteja livre (inclui jogadores)
                     else:
                         # Sobrescreve com VAZIO. Isso automaticamente "mata" jogadores, 
