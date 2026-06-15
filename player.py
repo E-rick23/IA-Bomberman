@@ -70,9 +70,23 @@ class Player:
                 self._plantar_bomba(matriz)
 
             if delta_x != 0 or delta_y != 0:
+                alvo_y = self.y + delta_y
+                alvo_x = self.x + delta_x
+                
+                # Verifica se a célula alvo está dentro dos limites do mapa
+                if 0 <= alvo_y < LINHAS and 0 <= alvo_x < COLUNAS:
+                    alvo = matriz[alvo_y][alvo_x]
+                                    
+                # Se a célula tiver algo que NÃO seja o cenário padrão ou outros players, é um inimigo!
+                if alvo not in (VAZIO, PAREDE, BLOCO_DESTRUTIVEL, BOMBA, FOGO, P1, P2, P3, P4):
+                    self.vivo = False
+                    matriz[self.y][self.x] = VAZIO # Limpa o player da matriz
+                    return # Encerra o input
+                                
+                # Se não encostou em um inimigo, tenta realizar o movimento
                 self.y, self.x = movimento.tentar_mover(
                     matriz, self.y, self.x, delta_y, delta_x, self.id
-                )
+                    )
 
         elif evento.type == pygame.KEYUP:
             teclas_movimento = {
