@@ -35,7 +35,7 @@ class Menu:
         self.algoritmo_inimigos = ["BFS", "DFS", "A*", "Busca Gulosa"]
         self.algoritmo = 0
 
-        # Índice do botão (0=Tamanho, 1=Players, 2=Dificuldade, 3=Jogar)
+        # Índice do botão (0=Tamanho, 1=Players, 2=Qnt_inimigos, 3=Algoritimo do inimigo 4=Jogar)
         self.opcao_focada = 0
 
     def desenhar_texto(self, texto, fonte, cor, x, y, centralizado=True):
@@ -140,7 +140,7 @@ class Menu:
                             )
 
                     elif evento.key == pygame.K_RETURN:
-                        if self.opcao_focada == 3:
+                        if self.opcao_focada == 4:
                             return self.coletar_configuracoes()
 
                 elif evento.type == pygame.MOUSEBUTTONDOWN and evento.button == 1:
