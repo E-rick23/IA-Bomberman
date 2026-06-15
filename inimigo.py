@@ -23,7 +23,7 @@ def tem_linha_de_visao(matriz, y1, x1, y2, x2): # Verifica se o player está na 
 
 
 class Inimigo:
-    def __init__(self, y, x, id_inimigo, algoritmo="bfs"):
+    def __init__(self, y, x, id_inimigo, algoritmo="a_estrela"):
         self.y = y
         self.x = x
         self.id = id_inimigo
