@@ -1,6 +1,7 @@
 import random
 import config
 import movimento
+import efeitos
 from motores_busca import busca_bfs, busca_a_estrela, busca_dfs, busca_gulosa
 
 def tem_linha_de_visao(matriz, y1, x1, y2, x2): # Verifica se o player está na linha de visão do inimigo
@@ -47,8 +48,16 @@ class Inimigo:
             self._tomar_decisao(matriz, jogador_alvo)
 
     def _verificar_morte(self, matriz):
+        # Se a bomba explodiu exatamente onde ele já estava (a matriz virou VAZIO)
         if matriz[self.y][self.x] in (config.VAZIO, config.FOGO):
             self.vivo = False
+            return
+        # Se ele andou para dentro de um tile com fogo ativo    
+        for efeito in efeitos.efeitos_ativos:
+                    if efeito.y == self.y and efeito.x == self.x and "fogo" in efeito.tipo:
+                        self.vivo = False
+                        matriz[self.y][self.x] = config.VAZIO # Limpa o "corpo" do inimigo da matriz
+                        break
 
     def _tomar_decisao(self, matriz, jogador_alvo):
         if self.estado == "VAGANDO" and jogador_alvo and jogador_alvo.vivo:

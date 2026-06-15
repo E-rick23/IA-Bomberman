@@ -1,6 +1,7 @@
 import pygame
 from config import *
 import movimento
+import efeitos
 import bombas
 
 
@@ -116,6 +117,13 @@ class Player:
         # Se a célula foi tomada pelo fogo (8) ou limpa sem o jogador se mover (0)
         if matriz[self.y][self.x] in (VAZIO, FOGO):
             self.vivo = False
+            return
+        # Se ele andou para dentro de um tile com fogo ativo
+        for efeito in efeitos.efeitos_ativos:
+            if efeito.y == self.y and efeito.x == self.x and "fogo" in efeito.tipo:
+                self.vivo = False
+                matriz[self.y][self.x] = VAZIO # Limpa o "corpo" do inimigo da matriz
+                break
 
     def desenhar(self, tela, animacoes):
         if not self.vivo:
