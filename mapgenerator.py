@@ -58,15 +58,36 @@ def posicionar_jogadores(matriz, qtd_jogadores):
         matriz[L][C] = config.P4  # Inferior Direito
 
 def posicionar_inimigos(matriz, qtd_inimigos):
-    inimigos = []
-
-    while len(inimigos) < qtd_inimigos:
-        x = random.randint(1, config.COLUNAS - 1)
-        y = random.randint(1, config.LINHAS - 1)
-        
-        if not (x % 2 != 0 and y % 2 != 0):
-            if matriz[y][x] != 9:
-                matriz[y][x] = 9
-                inimigos.append([x, y])
+    inimigos_gerados = []
+    metade_y = config.LINHAS // 2
+    metade_x = config.COLUNAS // 2
+    posicoes_vazias = []
     
-    return inimigos
+    for y in range(config.LINHAS):
+        for x in range(config.COLUNAS):
+            fora_do_quadrante_player = (y > metade_y) or (x > metade_x)
+            
+            if matriz[y][x] == config.VAZIO and fora_do_quadrante_player:
+                posicoes_vazias.append((y, x))
+                
+    random.shuffle(posicoes_vazias)
+    
+    for i in range(qtd_inimigos):
+        if not posicoes_vazias:
+            break
+            
+        y, x = posicoes_vazias.pop()
+        
+        id_inimigo = config.INIMIGO + i 
+        matriz[y][x] = id_inimigo
+        
+        direcoes = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        for dy, dx in direcoes:
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < config.LINHAS and 0 <= nx < config.COLUNAS:
+                if matriz[ny][nx] == config.BLOCO_DESTRUTIVEL:
+                    matriz[ny][nx] = config.VAZIO 
+                    
+        inimigos_gerados.append({"y": y, "x": x, "id": id_inimigo})
+        
+    return inimigos_gerados

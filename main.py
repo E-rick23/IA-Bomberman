@@ -56,7 +56,7 @@ def main():
         mapgenerator.gerar_pilares(tabuleiro)
         mapgenerator.espalhar_blocos(tabuleiro, densidade=0.60)
         mapgenerator.posicionar_jogadores(tabuleiro, qtd_jogadores)
-        posicoes_inimigos = mapgenerator.posicionar_inimigos(tabuleiro, qtd_inimigos)
+        dados_inimigos = mapgenerator.posicionar_inimigos(tabuleiro, qtd_inimigos)
 
         L, C = config.LINHAS - 1, config.COLUNAS - 1
 
@@ -89,7 +89,7 @@ def main():
         ]
 
         # print(posicoes_inimigos, algoritmo_inimigos)
-        inimigos = [Inimigo(posicao[0], posicao[1], 9, algoritmo_inimigos) for posicao in posicoes_inimigos]      
+        inimigos = [Inimigo(dados["y"], dados["x"], dados["id"], algoritmo_inimigos) for dados in dados_inimigos]     
         jogadores = pool_jogadores[:qtd_jogadores]
 
         rodando = True
