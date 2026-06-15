@@ -25,19 +25,14 @@ class Menu:
         # Opções dos seletores
         self.tamanhos_mapa = [9, 11, 13, 15]
         self.tamanho = 0
-    
+
         self.qtd_players = [1, 2, 3, 4]
         self.players = 0
 
         self.qtd_inimigos = [1, 2, 3, 4]
         self.inimigos = 0
-        
-        self.algoritmo_inimigos = [
-            "BFS",
-            "DFS",
-            "A*",
-            "Busca Gulosa"
-        ]
+
+        self.algoritmo_inimigos = ["BFS", "DFS", "A*", "Busca Gulosa"]
         self.algoritmo = 0
 
         # Índice do botão (0=Tamanho, 1=Players, 2=Dificuldade, 3=Jogar)
@@ -65,7 +60,9 @@ class Menu:
             cor_tamanho = AZUL_SELECIONADO if self.opcao_focada == 0 else BRANCO
             cor_players = AZUL_SELECIONADO if self.opcao_focada == 1 else BRANCO
             cor_inimigos = AZUL_SELECIONADO if self.opcao_focada == 2 else BRANCO
-            cor_algoritmo_inimigos = AZUL_SELECIONADO if self.opcao_focada == 3 else BRANCO
+            cor_algoritmo_inimigos = (
+                AZUL_SELECIONADO if self.opcao_focada == 3 else BRANCO
+            )
             cor_jogar = AZUL_SELECIONADO if self.opcao_focada == 4 else CINZA
 
             # Renderizar Seletores
@@ -80,7 +77,7 @@ class Menu:
             rect_players = self.desenhar_texto(
                 txt_players, self.fonte_opcoes, cor_players, self.largura // 2, 220
             )
-            
+
             txt_inimigos = (
                 f"Quantidade de Inimigos:  <  {self.qtd_inimigos[self.inimigos]}  >"
             )
@@ -88,9 +85,7 @@ class Menu:
                 txt_inimigos, self.fonte_opcoes, cor_inimigos, self.largura // 2, 280
             )
 
-            txt_algoritmo_inimigos = (
-                f"Algoritmo dos inimigos:  <  {self.algoritmo_inimigos[self.algoritmo]}  >"
-            )
+            txt_algoritmo_inimigos = f"Algoritmo dos inimigos:  <  {self.algoritmo_inimigos[self.algoritmo]}  >"
             rect_algoritmo_inimigos = self.desenhar_texto(
                 txt_algoritmo_inimigos,
                 self.fonte_opcoes,
@@ -128,8 +123,8 @@ class Menu:
                         elif self.opcao_focada == 2:
                             self.inimigos = (self.inimigos - 1) % len(self.qtd_inimigos)
                         elif self.opcao_focada == 3:
-                            self.dificuldade = (self.dificuldade - 1) % len(
-                                self.dificuldades
+                            self.algoritmo = (self.algoritmo - 1) % len(
+                                self.algoritmo_inimigos
                             )
 
                     elif evento.key == pygame.K_RIGHT:
@@ -140,8 +135,8 @@ class Menu:
                         elif self.opcao_focada == 2:
                             self.inimigos = (self.inimigos + 1) % len(self.qtd_inimigos)
                         elif self.opcao_focada == 3:
-                            self.dificuldade = (self.dificuldade + 1) % len(
-                                self.dificuldades
+                            self.algoritmo = (self.algoritmo + 1) % len(
+                                self.algoritmo_inimigos
                             )
 
                     elif evento.key == pygame.K_RETURN:
