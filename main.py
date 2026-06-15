@@ -144,8 +144,53 @@ def main():
 
             # Se ninguém estiver vivo o jogo acaba
             if not algum_vivo:
-                pygame.time.delay(1000)
-                rodando = False
+                # 1. Cria as fontes
+                fonte_derrota = pygame.font.SysFont("Arial", 55, bold=True)
+                fonte_instrucao = pygame.font.SysFont("Arial", 20, bold=False)
+                                
+                # 2. Renderiza os textos principais (Derrota em Vermelho)
+                texto_derr = fonte_derrota.render("DERROTA!", True, (255, 0, 0)) # Vermelho
+                texto_btn = fonte_instrucao.render("Pressione qualquer botão para voltar ao menu", True, (255, 255, 255)) # Branco
+                                
+                # 3. Renderiza as sombras (Preto)
+                sombra_derr = fonte_derrota.render("DERROTA!", True, (0, 0, 0))
+                sombra_btn = fonte_instrucao.render("Pressione qualquer botão para voltar ao menu", True, (0, 0, 0))
+                                
+                # Opcional: Um pequeno delay antes da mensagem aparecer para ver a morte
+                pygame.time.delay(500)
+                                
+                # Loop de espera
+                aguardando_input = True
+                while aguardando_input:
+                    # Calcula as posições centrais
+                    pos_x_derr = (largura - texto_derr.get_width()) // 2
+                    pos_y_derr = (altura - texto_derr.get_height()) // 2 - 20
+                                    
+                    pos_x_btn = (largura - texto_btn.get_width()) // 2
+                    pos_y_btn = pos_y_derr + 65
+                                    
+                    # Desenha a borda/sombra preta
+                    for dx in [-2, 0, 2]:
+                        for dy in [-2, 0, 2]:
+                            if dx != 0 or dy != 0:
+                                tela.blit(sombra_derr, (pos_x_derr + dx, pos_y_derr + dy))
+                                tela.blit(sombra_btn, (pos_x_btn + dx, pos_y_btn + dy))
+                                    
+                    # Desenha os textos coloridos por cima
+                    tela.blit(texto_derr, (pos_x_derr, pos_y_derr))
+                    tela.blit(texto_btn, (pos_x_btn, pos_y_btn))
+                                    
+                    pygame.display.flip()
+                                    
+                    # Captura os eventos dentro deste loop de espera
+                    for evento in pygame.event.get():
+                        if evento.type == pygame.QUIT:
+                            aguardando_input = False
+                            rodando = False
+                            acao_pos_jogo = "fechar"
+                        elif evento.type == pygame.KEYDOWN or evento.type == pygame.MOUSEBUTTONDOWN:
+                            aguardando_input = False
+                            rodando = False
 
             # 'any' verifica se existe pelo menos um inimigo vivo. 
             # 'not any' significa que todos estão mortos.
@@ -153,7 +198,10 @@ def main():
                 # Cria as fontes
                 fonte_vitoria = pygame.font.SysFont("Arial", 55, bold=True)
                 fonte_instrucao = pygame.font.SysFont("Arial", 20, bold=False)
-                            
+
+                sombra_vit = fonte_vitoria.render("VITÓRIA!", True, (0, 0, 0)) # Preto
+                sombra_btn = fonte_instrucao.render("Pressione qualquer botão para voltar ao menu", True, (0, 0, 0)) # Preto
+                                
                 # Renderiza o texto (Texto, Antialiasing, Cor RGB)
                 texto_vit = fonte_vitoria.render("VITÓRIA!", True, (0, 255, 0)) # Verde
                 texto_btn = fonte_instrucao.render("Pressione qualquer botão para voltar ao menu", True, (255, 255, 255)) # Branco
@@ -166,6 +214,13 @@ def main():
                     
                     pos_x_btn = (largura - texto_btn.get_width()) // 2
                     pos_y_btn = pos_y_vit + 65
+
+                    #Desenha a sombra antes do texto
+                    for dx in [-2, 0, 2]:
+                        for dy in [-2, 0, 2]:
+                            if dx != 0 or dy != 0: # Evita desenhar exatamente no centro ainda
+                                tela.blit(sombra_vit, (pos_x_vit + dx, pos_y_vit + dy))
+                                tela.blit(sombra_btn, (pos_x_btn + dx, pos_y_btn + dy))
                     
                     # Desenha as mensagens por cima do estado atual do mapa
                     tela.blit(texto_vit, (pos_x_vit, pos_y_vit))
