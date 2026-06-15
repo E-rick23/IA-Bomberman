@@ -32,7 +32,7 @@ def main():
         qtd_jogadores = config_escolhida["players"]
         qtd_inimigos = config_escolhida["inimigos"]
         algoritmo_inimigos = config_escolhida["algoritmo_inimigos"]
-        
+
         print(
             f"Iniciando mapa {config.LINHAS}x{config.COLUNAS} com {qtd_jogadores} players com {qtd_inimigos} inimigos com os motores de {algoritmo_inimigos}"
         )
@@ -89,7 +89,10 @@ def main():
         ]
 
         # print(posicoes_inimigos, algoritmo_inimigos)
-        inimigos = [Inimigo(dados["y"], dados["x"], dados["id"], algoritmo_inimigos) for dados in dados_inimigos]     
+        inimigos = [
+            Inimigo(dados["y"], dados["x"], dados["id"], algoritmo_inimigos)
+            for dados in dados_inimigos
+        ]
         jogadores = pool_jogadores[:qtd_jogadores]
 
         rodando = True
@@ -141,17 +144,17 @@ def main():
 
             # Se ninguém estiver vivo o jogo acaba
             if not algum_vivo:
-                pygame.time.delay(
-                    1000
-                )
+                pygame.time.delay(1000)
                 rodando = False
 
             for inimigo in inimigos:
                 if inimigo.vivo:
                     pos_x = inimigo.x * config.TILE_SIZE
                     pos_y = inimigo.y * config.TILE_SIZE + HUD_H
-                    pygame.draw.rect(tela, (255, 50, 50), (pos_x, pos_y, config.TILE_SIZE, config.TILE_SIZE))
-                    pygame.draw.rect(tela, (0, 0, 0), (pos_x, pos_y, config.TILE_SIZE, config.TILE_SIZE), 2)
+
+                    lista = visual.animacoes_por_sprite["inimigos"]
+                    sprite = lista[(pos_x + pos_y) % len(lista)]
+                    tela.blit(sprite, (pos_x, pos_y))
 
             for b in bombas.bombas_ativas:
                 if not b.explodiu:
@@ -179,7 +182,7 @@ def main():
             pygame.display.flip()
 
         if acao_pos_jogo == "fechar":
-            break 
+            break
 
     # Desligamento do jogo
     pygame.quit()

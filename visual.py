@@ -6,7 +6,9 @@ sprites_animados = {}
 animacoes_por_sprite = {}
 
 
-def recortar_sprite(sheet, col, linha, largura=config.SPRITE_SIZE, altura=config.SPRITE_SIZE):
+def recortar_sprite(
+    sheet, col, linha, largura=config.SPRITE_SIZE, altura=config.SPRITE_SIZE
+):
     rect = pygame.Rect(col * largura, linha * altura, largura, altura)
     sub = sheet.subsurface(rect)
     return pygame.transform.scale(sub, (config.TILE_SIZE, config.TILE_SIZE))
@@ -27,30 +29,35 @@ def _carregar_sprites_bomba():
     bomba = []
     for i in range(3):
         bomba.append(recortar_sprite(sheet_bomba, i, 0))
-    
+
     sprites_animados["bomba"] = bomba
 
 
 def _carregar_sprites_tijolo():
     sheet_tijolo = pygame.image.load("Assets/Tijolo.png").convert_alpha()
-    
+
     sprites[config.PAREDE] = recortar_sprite(sheet_tijolo, 0, 0)
     sprites[config.BLOCO_DESTRUTIVEL] = recortar_sprite(sheet_tijolo, 1, 0)
-    
+
     bloco_destruindo = []
-    
+
     for i in range(7):
         bloco_destruindo.append(recortar_sprite(sheet_tijolo, i, 0))
 
     sprites_animados["bloco_destruindo"] = bloco_destruindo
-    
-    
+
+
 def _carregar_sprites_fogo():
     sheet_fogo = pygame.image.load("Assets/Fogo.png").convert_alpha()
 
     partes_fogo = [
-        "fogo_centro", "fogo_horizontal", "fogo_vertical", 
-        "fogo_cima", "fogo_baixo", "fogo_esq", "fogo_dir"
+        "fogo_centro",
+        "fogo_horizontal",
+        "fogo_vertical",
+        "fogo_cima",
+        "fogo_baixo",
+        "fogo_esq",
+        "fogo_dir",
     ]
     for p in partes_fogo:
         sprites_animados[p] = []
@@ -66,17 +73,16 @@ def _carregar_sprites_fogo():
 
             # Centro da cruz (x=32, y=32)
             sprites_animados["fogo_centro"].append(extrair(32, 32))
-                        
+
             # Corpos (meios da cruz)
             sprites_animados["fogo_horizontal"].append(extrair(16, 32))
             sprites_animados["fogo_vertical"].append(extrair(32, 16))
-                        
+
             # Pontas extremas da cruz
             sprites_animados["fogo_cima"].append(extrair(32, 0))
             sprites_animados["fogo_baixo"].append(extrair(32, 64))
             sprites_animados["fogo_esq"].append(extrair(0, 32))
             sprites_animados["fogo_dir"].append(extrair(64, 32))
-            
 
 
 def _carregar_sprites_jogadores():
@@ -122,12 +128,27 @@ def _carregar_sprites_jogadores():
         animacoes_por_sprite[sprite_id] = anim
 
 
+def _carregar_sprites_inimigos():
+    sheet_inimigos = pygame.image.load("Assets/Inimigos.png").convert_alpha()
+
+    linha = 1
+    # 1,4,5,6
+
+    inimigos = []
+
+    for i in range(6):
+        inimigos.append(recortar_sprite(sheet_inimigos, i, linha))
+
+    animacoes_por_sprite["inimigos"] = inimigos
+
+
 def carregar_recursos():
     """Função principal que chama todos os sprites"""
     _carregar_sprites_bomba()
     _carregar_sprites_tijolo()
     _carregar_sprites_fogo()
     _carregar_sprites_jogadores()
+    _carregar_sprites_inimigos()
 
     # Sprites do mapa base
     sprites[config.VAZIO] = _fazer_sprite_solido((34, 139, 34))
