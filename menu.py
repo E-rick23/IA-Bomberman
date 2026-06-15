@@ -110,9 +110,9 @@ class Menu:
 
                 elif evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_DOWN:
-                        self.opcao_focada = (self.opcao_focada + 1) % 4
+                        self.opcao_focada = (self.opcao_focada + 1) % 5
                     elif evento.key == pygame.K_UP:
-                        self.opcao_focada = (self.opcao_focada - 1) % 4
+                        self.opcao_focada = (self.opcao_focada - 1) % 5
 
                     # Interagir com as setas do teclado nas opções laterais
                     elif evento.key == pygame.K_LEFT:
