@@ -1,7 +1,7 @@
+import random
 import config
 import movimento
-import random
-from motores_busca import busca_bfs, busca_a_estrela, busca_dfs, busca_gulosa 
+from motores_busca import busca_bfs, busca_a_estrela, busca_dfs, busca_gulosa
 
 def tem_linha_de_visao(matriz, y1, x1, y2, x2): # Verifica se o player está na linha de visão do inimigo
 
@@ -11,16 +11,14 @@ def tem_linha_de_visao(matriz, y1, x1, y2, x2): # Verifica se o player está na 
             if matriz[y1][x] in (config.PAREDE, config.BLOCO_DESTRUTIVEL): 
                 return False
         return True
-        
-    elif x1 == x2: # Mesma coluna
+    elif x1 == x2: #Mesma coluna
         passo = 1 if y2 > y1 else -1
         for y in range(y1 + passo, y2, passo):
             if matriz[y][x1] in (config.PAREDE, config.BLOCO_DESTRUTIVEL): 
                 return False
         return True
-        
+    
     return False
-
 
 class Inimigo:
     def __init__(self, y, x, id_inimigo, algoritmo="BFS"):
@@ -29,13 +27,10 @@ class Inimigo:
         self.id = id_inimigo
         self.vivo = True
         self.algoritmo = algoritmo
-        
-        # Controle de velocidade
         self.timer_movimento = 0
         self.tempo_por_passo = 500  
-        
         self.estado = "VAGANDO"
-        self.ultimo_local_visto = None
+        self.caminho_atual = [] 
 
     def atualizar(self, dt, matriz, jogador_alvo):
         if not self.vivo:
@@ -55,37 +50,41 @@ class Inimigo:
         if matriz[self.y][self.x] in (config.VAZIO, config.FOGO):
             self.vivo = False
 
-    # Toma decisão se deve perseguir ou vagar
     def _tomar_decisao(self, matriz, jogador_alvo):
-        if jogador_alvo and jogador_alvo.vivo:
+        if self.estado == "VAGANDO" and jogador_alvo and jogador_alvo.vivo:
             if tem_linha_de_visao(matriz, self.y, self.x, jogador_alvo.y, jogador_alvo.x):
                 self.estado = "PERSEGUINDO"
-                self.ultimo_local_visto = (jogador_alvo.y, jogador_alvo.x)
 
         if self.estado == "PERSEGUINDO":
-            if self.ultimo_local_visto:
+            if jogador_alvo and jogador_alvo.vivo:
+                alvo_atual = (jogador_alvo.y, jogador_alvo.x)
+
                 if self.algoritmo == "BFS":
-                    caminho = busca_bfs(matriz, (self.y, self.x), self.ultimo_local_visto)
+                    caminho = busca_bfs(matriz, (self.y, self.x), alvo_atual)
                 elif self.algoritmo == "DFS":
-                    caminho = busca_dfs(matriz, (self.y, self.x), self.ultimo_local_visto)
+                    caminho = busca_dfs(matriz, (self.y, self.x), alvo_atual)
                 elif self.algoritmo == "Busca Gulosa":
-                    caminho = busca_gulosa(matriz, (self.y, self.x), self.ultimo_local_visto)
+                    caminho = busca_gulosa(matriz, (self.y, self.x), alvo_atual)
                 elif self.algoritmo == "A*":
-                    caminho = busca_gulosa(matriz, (self.y, self.x), self.ultimo_local_visto)
+                    caminho = busca_a_estrela(matriz, (self.y, self.x), alvo_atual)
+                else:
+                    caminho = []
 
                 if caminho and len(caminho) > 1:
+                    self.caminho_atual = caminho[1:]
+                    
                     alvo_y, alvo_x = caminho[1]
                     self._mover_para(matriz, alvo_y, alvo_x, jogador_alvo)
-                    
-                    if self.y == self.ultimo_local_visto[0] and self.x == self.ultimo_local_visto[1]:
-                        self.estado = "VAGANDO"
-                        self.ultimo_local_visto = None
                 else:
-                    self.estado = "VAGANDO"
-                    self.ultimo_local_visto = None
+                    self.caminho_atual = []
                     self._vagar(matriz, jogador_alvo)
+            else:
+                self.estado = "VAGANDO"
+                self.caminho_atual = []
+                self._vagar(matriz, jogador_alvo)
                     
         elif self.estado == "VAGANDO":
+            self.caminho_atual = [] 
             self._vagar(matriz, jogador_alvo)
 
     def _mover_para(self, matriz, alvo_y, alvo_x, jogador_alvo):

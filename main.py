@@ -148,6 +148,27 @@ def main():
                 rodando = False
 
             for inimigo in inimigos:
+                if inimigo.vivo and inimigo.caminho_atual:
+                    # Cria uma superfície com canal Alpha (transparência)
+                    superficie_trilha = pygame.Surface((config.TILE_SIZE, config.TILE_SIZE), pygame.SRCALPHA)
+                    
+                    # Define a cor baseada no algoritmo (R, G, B, Alpha). Alpha = 80 para ficar translúcido
+                    if inimigo.algoritmo == "DFS":
+                        superficie_trilha.fill((255, 0, 0, 80))    # Vermelho
+                    elif inimigo.algoritmo == "BFS":
+                        superficie_trilha.fill((0, 0, 255, 80))    # Azul
+                    elif inimigo.algoritmo == "Busca Gulosa":
+                        superficie_trilha.fill((255, 255, 0, 80))  # Amarelo
+                    else: # A*
+                        superficie_trilha.fill((0, 255, 0, 80))    # Verde
+                    
+                    # Pinta cada bloco da rota calculada
+                    for (cy, cx) in inimigo.caminho_atual:
+                        pos_x = cx * config.TILE_SIZE
+                        pos_y = cy * config.TILE_SIZE + HUD_H
+                        tela.blit(superficie_trilha, (pos_x, pos_y))
+
+            for inimigo in inimigos:
                 if inimigo.vivo:
                     pos_x = inimigo.x * config.TILE_SIZE
                     pos_y = inimigo.y * config.TILE_SIZE + HUD_H
