@@ -174,7 +174,11 @@ def main():
                     pos_y = inimigo.visual_y + HUD_H
 
                     lista = visual.animacoes_por_sprite["inimigos"][inimigo.algoritmo]
-                    sprite = lista[int(pos_x + pos_y) % len(lista)]
+                    # Usa o tempo do Pygame para trocar o frame (ex: a cada 150 milissegundos)
+                    tempo_atual = pygame.time.get_ticks()
+                    indice_frame = (tempo_atual // 150) % len(lista)
+                                        
+                    sprite = lista[indice_frame]
                     tela.blit(sprite, (pos_x, pos_y))
 
             for b in bombas.bombas_ativas:
