@@ -88,8 +88,8 @@ def main():
             ),
         ]
 
-        print(posicoes_inimigos)
-        inimigos = [Inimigo(posicao[0], posicao[1], 9) for posicao in posicoes_inimigos]      
+        # print(posicoes_inimigos, algoritmo_inimigos)
+        inimigos = [Inimigo(posicao[0], posicao[1], 9, algoritmo_inimigos) for posicao in posicoes_inimigos]      
         jogadores = pool_jogadores[:qtd_jogadores]
 
         rodando = True
