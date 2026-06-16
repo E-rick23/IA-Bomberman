@@ -114,13 +114,14 @@ class Menu:
                     shift_pressionado = mods & pygame.KMOD_SHIFT
                     
                     if ctrl_pressionado and shift_pressionado and evento.key == pygame.K_UP:
+                        algoritmo_selecionado = self.algoritmo_inimigos[self.algoritmo]                        
                         print("Atalho de Desenvolvedor Ativado: Iniciando Mapa de Teste!")
                         return {
                             "modo_teste": True,
                             "tamanho": 15, 
                             "players": 1, 
                             "inimigos": 1, 
-                            "algoritmo_inimigos": "BFS" # Pode trocar pelo padrão que quiser testar
+                            "algoritmo_inimigos": algoritmo_selecionado
                         }
 
                     if evento.key == pygame.K_DOWN:
@@ -224,26 +225,6 @@ class Menu:
                 pygame.display.flip()
 
                 for evento in pygame.event.get():
-
-                    if evento.type == pygame.KEYDOWN:
-                        # Pega o estado dos modificadores (Ctrl, Shift, Alt)
-                        mods = pygame.key.get_mods()
-                        
-                        # Verifica se as teclas estão pressionadas usando operadores bit a bit (&)
-                        ctrl_pressionado = mods & pygame.KMOD_CTRL
-                        shift_pressionado = mods & pygame.KMOD_SHIFT
-                        
-                        # Se Ctrl + Shift + Seta para Cima foram pressionados
-                        if ctrl_pressionado and shift_pressionado and evento.key == pygame.K_UP:
-                            print("Atalho de Desenvolvedor Ativado: Iniciando Mapa de Teste!")
-                            # Retorna um dicionário com uma flag especial "modo_teste"
-                            return {
-                                "modo_teste": True,
-                                "tamanho": 15, 
-                                "players": 1, 
-                                "inimigos": 1, 
-                                "algoritmo_inimigos": "BFS" # Pode deixar um padrão aqui
-                            }
                     if evento.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit()
