@@ -1,6 +1,7 @@
 import pygame
 from config import *
 import movimento
+import efeitos
 import bombas
 
 
@@ -40,6 +41,8 @@ class Player:
         self.y = y
         self.x = x
         self.id = player_id
+        self.visual_x = self.x * TILE_SIZE 
+        self.visual_y = self.y * TILE_SIZE
         self.sprite_id = sprite_id
         self.direcao = "baixo"
         self.status = "parado"
@@ -69,9 +72,23 @@ class Player:
                 self._plantar_bomba(matriz)
 
             if delta_x != 0 or delta_y != 0:
+                alvo_y = self.y + delta_y
+                alvo_x = self.x + delta_x
+                
+                # Verifica se a célula alvo está dentro dos limites do mapa
+                if 0 <= alvo_y < LINHAS and 0 <= alvo_x < COLUNAS:
+                    alvo = matriz[alvo_y][alvo_x]
+                                    
+                    # Se a célula tiver algo que NÃO seja o cenário padrão ou outros players, é um inimigo!
+                    if alvo not in (VAZIO, PAREDE, BLOCO_DESTRUTIVEL, BOMBA, FOGO, P1, P2, P3, P4):
+                        self.vivo = False
+                        matriz[self.y][self.x] = VAZIO # Limpa o player da matriz
+                        return # Encerra o input
+                                
+                # Se não encostou em um inimigo, tenta realizar o movimento
                 self.y, self.x = movimento.tentar_mover(
                     matriz, self.y, self.x, delta_y, delta_x, self.id
-                )
+                    )
 
         elif evento.type == pygame.KEYUP:
             teclas_movimento = {
@@ -102,6 +119,14 @@ class Player:
         self._atualizar_animacao(dt, animacoes)
         self._verificar_morte(matriz)
 
+        # Suavização do Movimento Visual
+        alvo_x = self.x * TILE_SIZE
+        alvo_y = self.y * TILE_SIZE
+                
+        # O fator 0.3 define a "velocidade do deslize". Quanto mais perto de 1, mais duro.
+        self.visual_x += (alvo_x - self.visual_x) * 0.3
+        self.visual_y += (alvo_y - self.visual_y) * 0.3
+
     def _atualizar_animacao(self, dt, animacoes):
         if self.status == "andando":
             self.timer_animacao += dt
@@ -116,6 +141,13 @@ class Player:
         # Se a célula foi tomada pelo fogo (8) ou limpa sem o jogador se mover (0)
         if matriz[self.y][self.x] in (VAZIO, FOGO):
             self.vivo = False
+            return
+        # Se ele andou para dentro de um tile com fogo ativo
+        for efeito in efeitos.efeitos_ativos:
+            if efeito.y == self.y and efeito.x == self.x and "fogo" in efeito.tipo:
+                self.vivo = False
+                matriz[self.y][self.x] = VAZIO # Limpa o "corpo" do inimigo da matriz
+                break
 
     def desenhar(self, tela, animacoes):
         if not self.vivo:

@@ -170,6 +170,18 @@ class Menu:
                     self._atualizar_fontes()
 
                 elif evento.type == pygame.KEYDOWN:
+                    # Atalho de desenvolvedor: Ctrl+Shift+↑ inicia mapa de teste
+                    mods = pygame.key.get_mods()
+                    if (mods & pygame.KMOD_CTRL) and (mods & pygame.KMOD_SHIFT) and evento.key == pygame.K_UP:
+                        print("Atalho de Desenvolvedor Ativado: Iniciando Mapa de Teste!")
+                        return {
+                            "modo_teste": True,
+                            "tamanho": 15,
+                            "players": 1,
+                            "inimigos": 1,
+                            "algoritmo_inimigos": self.seletores[3].valor,
+                        }
+
                     resultado = self._processar_teclado(evento.key)
                     if resultado is not None:
                         return resultado

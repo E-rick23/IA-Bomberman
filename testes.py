@@ -1,6 +1,9 @@
 import movimento
 import bombas
 from config import *
+import config
+from player import Player
+from inimigo import Inimigo
 
 def testar_movimentacao(tabuleiro):
     #Função para teste da mecânica de movimento
@@ -21,10 +24,6 @@ def testar_movimentacao(tabuleiro):
         
     print("\n--- Estado Após Segundo Movimento ---")
     print(tabuleiro)
-    
-import movimento
-import bombas
-from config import *
 
 # ... (sua função testar_movimentacao continua aqui em cima, se quiser mantê-la) ...
 
@@ -68,3 +67,37 @@ def testar_bombas(tabuleiro):
     # A bomba sumiu. O fogo consumiu a célula (0,0) que estava livre, 
     # destruiu os blocos em (0,2) ou (0,3), mas poupou o jogador em (1,0)!
     print(tabuleiro)
+
+def mapa_teste(sprites_escolhidos, algoritmo_inimigos):
+    """
+    Configura um cenário completo de teste 15x15:
+    - Redimensiona o mapa global.
+    - Cria o tabuleiro apenas com pilares (sem blocos destrutíveis).
+    - Instancia 1 Player e 1 Inimigo nas posições corretas.
+    Retorna o tabuleiro e as listas de entidades prontas para a main.
+    """
+    #Força as configurações de tamanho para o ambiente de teste
+    config.LINHAS = 15
+    config.COLUNAS = 15
+    
+    #Cria a matriz vazia e espalha os pilares fixos
+    tabuleiro = [[config.VAZIO for _ in range(config.COLUNAS)] for _ in range(config.LINHAS)]
+    for y in range(1, config.LINHAS, 2):
+        for x in range(1, config.COLUNAS, 2):
+            tabuleiro[y][x] = config.PAREDE
+            
+    #Registra os IDs das entidades na matriz de posições
+    tabuleiro[0][0] = config.P1
+    tabuleiro[config.LINHAS - 1][config.COLUNAS - 1] = config.INIMIGO
+    
+    #Instancia o objeto do Jogador 1
+    sprite_p1 = sprites_escolhidos[0] if sprites_escolhidos else 0
+    jogadores = [Player(0, 0, config.P1, sprite_id=sprite_p1)]
+    
+    #Instancia o objeto do inimigo com o algoritmo selecionado
+    inimigos = [Inimigo(config.LINHAS - 1, config.COLUNAS - 1, config.INIMIGO, algoritmo_inimigos)]
+    
+    print(f" Arena de Teste 15x15 inicializada com sucesso ({algoritmo_inimigos})")
+    
+    return tabuleiro, jogadores, inimigos
+    return tabuleiro, dados_inimigos
