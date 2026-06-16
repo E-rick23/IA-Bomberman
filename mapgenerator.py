@@ -7,7 +7,6 @@ def criar_matriz_vazia():
     """Cria uma matriz preenchida com zeros"""
     return np.zeros((config.LINHAS, config.COLUNAS), dtype=int)
 
-
 def gerar_pilares(matriz):
     """Cria as paredes fixas no mapa, estilo xadrez"""
     for y in range(config.LINHAS):

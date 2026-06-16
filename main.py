@@ -26,6 +26,9 @@ def main():
         # Executa o menu para coletar as configurações iniciais do mapa e quantidade de jogadores
         config_escolhida = menu.rodar()
 
+        # Verifica se o atalho de teclado foi ativado no menu
+        modo_teste_ativo = config_escolhida.get("modo_teste", False)
+
         # Injetar as configurações escolhidas no config global antes do jogo iniciar
         config.LINHAS = config_escolhida["tamanho"]
         config.COLUNAS = config_escolhida["tamanho"]
@@ -39,9 +42,60 @@ def main():
 
         # Carrega as animações e sprites antes da seleção para que a UI possa exibir o preview dos heróis
         visual.carregar_recursos()
+        
+        # Se for modo de teste, pula a tela de seleção de heróis
+        if modo_teste_ativo:
+            sprites_escolhidos = [0] # Usa o sprite padrão 0
+        else:
+            sprites_escolhidos = menu.selecionar_personagens(qtd_jogadores) # Abre a tela de seleção de personagens
+        if modo_teste_ativo:
+            import testes
+            tabuleiro, jogadores, inimigos = testes.mapa_teste(sprites_escolhidos, algoritmo_inimigos)
+        else:
+            # Gerar mapa
+            tabuleiro = mapgenerator.criar_matriz_vazia()
+            mapgenerator.gerar_pilares(tabuleiro)
+            mapgenerator.espalhar_blocos(tabuleiro, densidade=0.60)
+            mapgenerator.posicionar_jogadores(tabuleiro, qtd_jogadores)
+            dados_inimigos = mapgenerator.posicionar_inimigos(tabuleiro, qtd_inimigos)
 
-        # Abre a tela de seleção de personagens
-        sprites_escolhidos = menu.selecionar_personagens(qtd_jogadores)
+            L, C = config.LINHAS - 1, config.COLUNAS - 1
+
+            # Cria o pool de jogadores injetando o sprite_id correspondente
+            pool_jogadores = [
+                Player(
+                    0,
+                    0,
+                    config.P1,
+                    sprite_id=sprites_escolhidos[0] if qtd_jogadores > 0 else 0,
+                ),
+                Player(
+                    0,
+                    C,
+                    config.P2,
+                    sprite_id=sprites_escolhidos[1] if qtd_jogadores > 1 else 1,
+                ),
+                Player(
+                    L,
+                    0,
+                    config.P3,
+                    sprite_id=sprites_escolhidos[2] if qtd_jogadores > 2 else 2,
+                ),
+                Player(
+                    L,
+                    C,
+                    config.P4,
+                    sprite_id=sprites_escolhidos[3] if qtd_jogadores > 3 else 3,
+                ),
+            ]
+
+            # print(posicoes_inimigos, algoritmo_inimigos)
+            inimigos = [
+                Inimigo(dados["y"], dados["x"], dados["id"], algoritmo_inimigos)
+                for dados in dados_inimigos
+            ]
+            jogadores = pool_jogadores[:qtd_jogadores]
+        
 
         # Configurar a janela da partida baseada no tamanho do mapa escolhido
         largura = config.COLUNAS * config.TILE_SIZE
@@ -51,49 +105,7 @@ def main():
         tela = pygame.display.set_mode((largura, altura))
         clock = pygame.time.Clock()
 
-        # Gerar mapa
-        tabuleiro = mapgenerator.criar_matriz_vazia()
-        mapgenerator.gerar_pilares(tabuleiro)
-        mapgenerator.espalhar_blocos(tabuleiro, densidade=0.60)
-        mapgenerator.posicionar_jogadores(tabuleiro, qtd_jogadores)
-        dados_inimigos = mapgenerator.posicionar_inimigos(tabuleiro, qtd_inimigos)
-
-        L, C = config.LINHAS - 1, config.COLUNAS - 1
-
-        # Cria o pool de jogadores injetando o sprite_id correspondente
-        pool_jogadores = [
-            Player(
-                0,
-                0,
-                config.P1,
-                sprite_id=sprites_escolhidos[0] if qtd_jogadores > 0 else 0,
-            ),
-            Player(
-                0,
-                C,
-                config.P2,
-                sprite_id=sprites_escolhidos[1] if qtd_jogadores > 1 else 1,
-            ),
-            Player(
-                L,
-                0,
-                config.P3,
-                sprite_id=sprites_escolhidos[2] if qtd_jogadores > 2 else 2,
-            ),
-            Player(
-                L,
-                C,
-                config.P4,
-                sprite_id=sprites_escolhidos[3] if qtd_jogadores > 3 else 3,
-            ),
-        ]
-
-        # print(posicoes_inimigos, algoritmo_inimigos)
-        inimigos = [
-            Inimigo(dados["y"], dados["x"], dados["id"], algoritmo_inimigos)
-            for dados in dados_inimigos
-        ]
-        jogadores = pool_jogadores[:qtd_jogadores]
+        
 
         rodando = True
         acao_pos_jogo = (
